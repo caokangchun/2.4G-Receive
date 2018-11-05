@@ -1,0 +1,1436 @@
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ASCII2HID
+OBJECT MODULE PLACED IN .\obj\ascii2hid.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\app\src\ascii2hid.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\
+                    -app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\ascii2hid.ls
+                    -t) OBJECT(.\obj\ascii2hid.obj)
+
+line level    source
+
+   1          
+   2          #include "ascii2hid.h"
+   3          
+   4          //---------------------------------------------------
+   5          //          USA   ASCII <-> HID   TABLE
+   6          //---------------------------------------------------
+   7          code CONVERT lang_USA[] = 
+   8          {
+   9                  0,                                              0x00, // 0
+  10                  0,                                              0x00, // 1
+  11                  0,                                              0x00, // 2
+  12                  0,                                              0x00, // 3
+  13                  0,                                              0x00, // 4
+  14                  0,                                              0x00, // 5
+  15                  0,                                              0x00, // 6
+  16                  0,                                              0x00, // 7
+  17                  hid_back,                               0x00, // 8
+  18                  hid_tab,                                0x00, // 9
+  19                  hid_down,                               0x00, // 0A
+  20                  0,                                              0x00, // 0B
+  21                  0,                                              0x00, // 0C
+  22                  hid_enter,                              0x00, // 0D
+  23                  hid_f1,                                 0x00, // 0E
+  24                  hid_f2,                                 0x00, // 0F
+  25                  hid_f3,                                 0x00, // 10
+  26                  hid_f4,                                 0x00, // 11
+  27                  hid_f5,                                 0x00, // 12
+  28                  hid_f6,                                 0x00, // 13
+  29                  hid_f7,                                 0x00, // 14
+  30                  hid_f8,                                 0x00, // 15
+  31                  hid_f9,                                 0x00, // 16
+  32                  hid_f10,                                0x00, // 17
+  33                  hid_f11,                                0x00, // 18
+  34                  hid_f12,                                0x00, // 19
+  35                  0,                                              0x00, // 1A
+  36                  hid_esc,                                0x00, // 1B
+  37                  0,                                              0x00, // 1C
+  38                  0,                                              0x00, // 1D
+  39                  0,                                              0x00, // 1E
+  40                  0,                                              0x00, // 1F
+  41                  
+  42                  hid_space,                              0x00, // 20 SPACE
+  43                  hid_1,                                  0x20, // 21 !
+  44                  hid_quotation_mark,             0x20, // 22 "
+  45                  hid_3,                                  0x20, // 23 #
+  46                  hid_4,                                  0x20, // 24 $
+  47                  hid_5,                                  0x20, // 25 %
+  48                  hid_7,                                  0x20, // 26 &
+  49                  hid_quotation_mark,             0x00, // 27 '
+  50                  hid_9,                                  0x20, // 28 (
+  51                  hid_0,                                  0x20, // 29 )
+  52                  hid_8,                                  0x20, // 2A *
+  53                  hid_equal_mark,                 0x20, // 2B +
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 2   
+
+  54                  hid_comma,                              0x00, // 2C ,
+  55                  hid_underline,                  0x00, // 2D -
+  56                  hid_full_stop,                  0x00, // 2E .
+  57                  hid_solidus_r,                  0x00, // 2F /
+  58                  
+  59                  hid_0,                                  0x00, // 30 0
+  60                  hid_1,                                  0x00, // 31 1
+  61                  hid_2,                                  0x00, // 32 2
+  62                  hid_3,                                  0x00, // 33 3
+  63                  hid_4,                                  0x00, // 34 4
+  64                  hid_5,                                  0x00, // 35 5
+  65                  hid_6,                                  0x00, // 36 6
+  66                  hid_7,                                  0x00, // 37 7
+  67                  hid_8,                                  0x00, // 38 8
+  68                  hid_9,                                  0x00, // 39 9
+  69                  
+  70                  hid_semicolon,                  0x20, // 3A :
+  71                  hid_semicolon,                  0x00, // 3B ;
+  72                  hid_comma,                              0x20, // 3C <
+  73                  hid_equal_mark,                 0x00, // 3D =
+  74                  hid_full_stop,                  0x20, // 3E >
+  75                  hid_solidus_r,                  0x20, // 3F ?
+  76                  hid_2,                                  0x20, // 40 @
+  77                  
+  78                  hid_a,                                  0x20, // 41 A
+  79                  hid_b,                                  0x20, // 42 B
+  80                  hid_c,                                  0x20, // 43 C
+  81                  hid_d,                                  0x20, // 44 D
+  82                  hid_e,                                  0x20, // 45 E
+  83                  hid_f,                                  0x20, // 46 F
+  84                  hid_g,                                  0x20, // 47 G
+  85                  hid_h,                                  0x20, // 48 H
+  86                  hid_i,                                  0x20, // 49 I
+  87                  hid_j,                                  0x20, // 4A J
+  88                  hid_k,                                  0x20, // 4B K
+  89                  hid_l,                                  0x20, // 4C L
+  90                  hid_m,                                  0x20, // 4D M
+  91                  hid_n,                                  0x20, // 4E N
+  92                  hid_o,                                  0x20, // 4F O
+  93                  hid_p,                                  0x20, // 50 P
+  94                  hid_q,                                  0x20, // 51 Q
+  95                  hid_r,                                  0x20, // 52 R
+  96                  hid_s,                                  0x20, // 53 S
+  97                  hid_t,                                  0x20, // 54 T
+  98                  hid_u,                                  0x20, // 55 U
+  99                  hid_v,                                  0x20, // 56 V
+ 100                  hid_w,                                  0x20, // 57 W
+ 101                  hid_x,                                  0x20, // 58 X
+ 102                  hid_y,                                  0x20, // 59 Y
+ 103                  hid_z,                                  0x20, // 5A Z
+ 104                  
+ 105                  hid_braces_l,                   0x00, // 5B [
+ 106                  hid_solidus_l,                  0x00, // 5C "\"
+ 107                  hid_braces_r,                   0x00, // 5D ]
+ 108                  hid_6,                                  0x20, // 5E ^
+ 109                  hid_underline,                  0x20, // 5F _
+ 110                  hid_wave_line,                  0x00, // 60 `
+ 111                  
+ 112                  hid_a,                                  0x00, // 61 a
+ 113                  hid_b,                                  0x00, // 62 b
+ 114                  hid_c,                                  0x00, // 63 c
+ 115                  hid_d,                                  0x00, // 64 d
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 3   
+
+ 116                  hid_e,                                  0x00, // 65 e
+ 117                  hid_f,                                  0x00, // 66 f
+ 118                  hid_g,                                  0x00, // 67 g
+ 119                  hid_h,                                  0x00, // 68 h
+ 120                  hid_i,                                  0x00, // 69 i
+ 121                  hid_j,                                  0x00, // 6A j
+ 122                  hid_k,                                  0x00, // 6B k
+ 123                  hid_l,                                  0x00, // 6C l
+ 124                  hid_m,                                  0x00, // 6D m
+ 125                  hid_n,                                  0x00, // 6E n
+ 126                  hid_o,                                  0x00, // 6F o
+ 127                  hid_p,                                  0x00, // 70 p
+ 128                  hid_q,                                  0x00, // 71 q
+ 129                  hid_r,                                  0x00, // 72 r
+ 130                  hid_s,                                  0x00, // 73 s
+ 131                  hid_t,                                  0x00, // 74 t
+ 132                  hid_u,                                  0x00, // 75 u
+ 133                  hid_v,                                  0x00, // 76 v
+ 134                  hid_w,                                  0x00, // 77 w
+ 135                  hid_x,                                  0x00, // 78 x
+ 136                  hid_y,                                  0x00, // 79 y
+ 137                  hid_z,                                  0x00, // 7A z
+ 138                  
+ 139                  hid_braces_l,                   0x20, // 7B {
+ 140                  hid_solidus_l,                  0x20, // 7C |
+ 141                  hid_braces_r,                   0x20, // 7D }
+ 142                  hid_wave_line,                  0x20, // 7E ~
+ 143                  hid_del,                                0x00, // 7F DEL
+ 144          
+ 145                  /* below are not standard ascii */
+ 146                  hid_f1,                                 0x00, // 80
+ 147                  hid_f2,                                 0x00, // 81
+ 148                  hid_f3,                                 0x00, // 82
+ 149                  hid_f4,                                 0x00, // 83
+ 150                  hid_f5,                                 0x00, // 84
+ 151                  hid_f6,                                 0x00, // 85
+ 152                  hid_f7,                                 0x00, // 86
+ 153                  hid_f8,                                 0x00, // 87
+ 154                  hid_f9,                                 0x00, // 88
+ 155                  hid_f10,                                0x00, // 89
+ 156                  hid_f11,                                0x00, // 8A
+ 157                  hid_f12,                                0x00, // 8B
+ 158                  hid_f12,                                0x00, // 8B
+ 159                  0xF1,                                   0x02, // 8C
+ 160                  0xF8,                                   0x02, // 8D
+ 161                  0xF1,                                   0x20, // 8E
+ 162                  0xF8,                                   0x20, // 8F
+ 163                  0xF1,                                   0x04, // 90
+ 164                  0xF8,                                   0x04, // 91
+ 165                  0xF1,                                   0x40, // 92
+ 166                  0xF8,                                   0x40, // 93
+ 167                  0xF1,                                   0x01, // 94
+ 168                  0xF8,                                   0x01, // 95
+ 169                  0xF1,                                   0x10, // 96
+ 170                  0xF8,                                   0x10, // 97
+ 171                  hid_nk_div,                             0x00, // 98
+ 172                  hid_nk_asterisk,                0x00, // 99
+ 173                  hid_nk_sub,                             0x00, // 9A
+ 174                  hid_nk_plus,                    0x00, // 9B
+ 175                  hid_nk_del,                             0x00, // 9C
+ 176                  hid_nk_enter,                   0x00, // 9D
+ 177                  hid_nk_0,                               0x00, // 9E
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 4   
+
+ 178                  hid_nk_1,                               0x00, // 9F
+ 179                  hid_nk_2,                               0x00, // A0
+ 180                  hid_nk_3,                               0x00, // A1
+ 181                  hid_nk_4,                               0x00, // A2
+ 182                  hid_nk_5,                               0x00, // A3
+ 183                  hid_nk_6,                               0x00, // A4
+ 184                  hid_nk_7,                               0x00, // A5
+ 185                  hid_nk_8,                               0x00, // A6
+ 186                  hid_nk_9,                               0x00, // A7
+ 187                  hid_ins,                                0x00, // A8
+ 188                  hid_del,                                0x00, // A9
+ 189                  hid_home,                               0x00, // AA
+ 190                  hid_end,                                0x00, // AB
+ 191                  hid_page_up,                    0x00, // AC
+ 192                  hid_page_down,                  0x00, // AD
+ 193                  hid_up,                                 0x00, // AE
+ 194                  hid_down,                               0x00, // AF
+ 195                  hid_left,                               0x00, // B0
+ 196                  hid_right,                              0x00, // B1
+ 197                  0,                                              0x00, // B2
+ 198                  hid_ins,                                0x00, // B3
+ 199                  hid_del,                                0x00, // B4
+ 200                  hid_home,                               0x00, // B5
+ 201                  hid_end,                                0x00, // B6
+ 202                  hid_page_up,                    0x00, // B7
+ 203                  hid_page_down,                  0x00, // B8
+ 204                  hid_up,                                 0x00, // B9
+ 205                  hid_down,                               0x00, // BA
+ 206                  hid_left,                               0x00, // BB
+ 207                  hid_right,                              0x00, // BC
+ 208                  0,                                              0x00, // BD
+ 209                  hid_nk_num,                             0x00, // BE
+ 210                  hid_caps,                               0x00, // BF
+ 211                  hid_scroll,                             0x00, // C0
+ 212          };
+ 213          
+ 214          //---------------------------------------------------
+ 215          //          TURKEY   ASCII  <-> HID   TABLE
+ 216          //---------------------------------------------------
+ 217          code CONVERT lang_TurkeyF[] = 
+ 218          {       
+ 219                  hid_space,                              0x00, // 20 SPACE
+ 220                  hid_1,                                  0x20, // 21 !
+ 221                  hid_2,                          0x20, // 22 "
+ 222                  hid_quotation_mark,             0x40, // 23 #
+ 223                  hid_4,                                  0x20, // 24 $
+ 224                  hid_5,                                  0x20, // 25 %
+ 225                  hid_6,                                  0x20, // 26 &
+ 226                  hid_7,                                  0x20, // 27 '
+ 227                  hid_8,                                  0x20, // 28 (
+ 228                  hid_9,                                  0x20, // 29 )
+ 229                  hid_wave_line,                  0x20, // 2A *
+ 230                  hid_wave_line,                  0x00, // 2B +
+ 231                  hid_solidus_r,                  0x00, // 2C ,
+ 232                  hid_equal_mark,                 0x00, // 2D -
+ 233                  hid_full_stop,                  0x00, // 2E .
+ 234                  hid_underline,                  0x00, // 2F /
+ 235                  
+ 236                  hid_0,                                  0x00, // 30 0
+ 237                  hid_1,                                  0x00, // 31 1
+ 238                  hid_2,                                  0x00, // 32 2
+ 239                  hid_3,                                  0x00, // 33 3
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 5   
+
+ 240                  hid_4,                                  0x00, // 34 4
+ 241                  hid_5,                                  0x00, // 35 5
+ 242                  hid_6,                                  0x00, // 36 6
+ 243                  hid_7,                                  0x00, // 37 7
+ 244                  hid_8,                                  0x00, // 38 8
+ 245                  hid_9,                                  0x00, // 39 9
+ 246                  
+ 247                  hid_full_stop,                  0x20, // 3A :
+ 248                  hid_solidus_r,                  0x20, // 3B ;
+ 249                  hid_k45,                            0x00, // 3C <
+ 250                  hid_0,                                  0x20, // 3D =
+ 251                  hid_k45,                                0x20, // 3E >
+ 252                  hid_underline,                  0x20, // 3F ?
+ 253                  hid_q,                                  0x40, // 40 @
+ 254                  
+ 255                  hid_f,                                  0x20, // 41 A
+ 256                  hid_comma,                              0x20, // 42 B
+ 257                  hid_v,                                  0x20, // 43 C
+ 258                  hid_y,                                  0x20, // 44 D
+ 259                  hid_d,                                  0x20, // 45 E
+ 260                  hid_q,                                  0x20, // 46 F
+ 261                  hid_w,                                  0x20, // 47 G
+ 262                  hid_o,                                  0x20, // 48 H
+ 263                  hid_r,                                  0x20, // 49 I
+ 264                  hid_z,                                  0x20, // 4A J
+ 265                  hid_j,                                  0x20, // 4B K
+ 266                  hid_l,                                  0x20, // 4C L
+ 267                  hid_k,                                  0x20, // 4D M
+ 268                  hid_i,                                  0x20, // 4E N
+ 269                  hid_t,                                  0x20, // 4F O
+ 270                  hid_p,                                  0x20, // 50 P
+ 271                  hid_braces_l,                   0x20, // 51 Q
+ 272                  hid_u,                                  0x20, // 52 R
+ 273                  hid_m,                                  0x20, // 53 S
+ 274                  hid_h,                                  0x20, // 54 T
+ 275                  hid_a,                                  0x20, // 55 U
+ 276                  hid_c,                                  0x20, // 56 V
+ 277                  hid_braces_r,                   0x20, // 57 W
+ 278                  hid_solidus_l,                  0x20, // 58 X
+ 279                  hid_semicolon,                  0x20, // 59 Y
+ 280                  hid_n,                                  0x20, // 5A Z
+ 281                  
+ 282                  hid_8,                                  0x40, // 5B [
+ 283                  hid_underline,                  0x40, // 5C "\"
+ 284                  hid_9,                                  0x40, // 5D ]
+ 285                  hid_3,                                  0x20, // 5E ^
+ 286                  hid_equal_mark,                 0x20, // 5F _
+ 287                  hid_solidus_l,                  0x40, // 60 `
+ 288                  
+ 289                  hid_f,                              0x00, // 61 a
+ 290                  hid_comma,                          0x00, // 62 b
+ 291                  hid_v,                              0x00, // 63 c
+ 292                  hid_y,                              0x00, // 64 d
+ 293                  hid_d,                              0x00, // 65 e
+ 294                  hid_q,                              0x00, // 66 f
+ 295                  hid_w,                              0x00, // 67 g
+ 296                  hid_o,                              0x00, // 68 h
+ 297                  hid_s,                                  0x00, // 69 i
+ 298                  hid_z,                              0x00, // 6A j
+ 299                  hid_j,                              0x00, // 6B k
+ 300                  hid_l,                              0x00, // 6C l
+ 301                  hid_k,                              0x00, // 6D m
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 6   
+
+ 302                  hid_i,                              0x00, // 6E n
+ 303                  hid_t,                              0x00, // 6F o
+ 304                  hid_p,                              0x00, // 70 p
+ 305                  hid_braces_l,           0x00, // 71 q
+ 306                  hid_u,                              0x00, // 72 r
+ 307                  hid_m,                              0x00, // 73 s
+ 308                  hid_h,                              0x00, // 74 t
+ 309                  hid_a,                              0x00, // 75 u
+ 310                  hid_c,                              0x00, // 76 v
+ 311                  hid_braces_r,           0x00, // 77 w
+ 312                  hid_solidus_l,          0x00, // 78 x
+ 313                  hid_semicolon,          0x00, // 79 y
+ 314                  hid_n,                              0x00, // 7A z
+ 315                  
+ 316                  hid_7,                                  0x40, // 7B {
+ 317                  hid_k45,                            0x40, // 7C |
+ 318                  hid_0,                                  0x40, // 7D }
+ 319                  hid_braces_r,                   0x40, // 7E ~
+ 320                  hid_del,                                0x00, // 7F DEL
+ 321          };
+ 322          
+ 323          //---------------------------------------------------
+ 324          //          TURKEY   ASCII  <-> HID   TABLE
+ 325          //---------------------------------------------------
+ 326          code CONVERT lang_TurkeyQ[] = 
+ 327          {       
+ 328                  hid_space,                              0x00, // 20 SPACE
+ 329                  hid_1,                                  0x20, // 21 !
+ 330                  hid_wave_line,                  0x00, // 22 "
+ 331                  hid_3,                                  0x40, // 23 #
+ 332                  hid_4,                                  0x40, // 24 $
+ 333                  hid_5,                                  0x20, // 25 %
+ 334                  hid_6,                                  0x20, // 26 &
+ 335                  hid_2,                                  0x20, // 27 '
+ 336                  hid_8,                                  0x20, // 28 (
+ 337                  hid_9,                                  0x20, // 29 )
+ 338                  hid_underline,                  0x00, // 2A *
+ 339                  hid_4,                                  0x20, // 2B +
+ 340                  hid_solidus_l,                  0x00, // 2C ,
+ 341                  hid_equal_mark,                 0x00, // 2D -
+ 342                  hid_solidus_r,                  0x00, // 2E .
+ 343                  hid_7,                                  0x20, // 2F /
+ 344                  
+ 345                  hid_0,                                  0x00, // 30 0
+ 346                  hid_1,                                  0x00, // 31 1
+ 347                  hid_2,                                  0x00, // 32 2
+ 348                  hid_3,                                  0x00, // 33 3
+ 349                  hid_4,                                  0x00, // 34 4
+ 350                  hid_5,                                  0x00, // 35 5
+ 351                  hid_6,                                  0x00, // 36 6
+ 352                  hid_7,                                  0x00, // 37 7
+ 353                  hid_8,                                  0x00, // 38 8
+ 354                  hid_9,                                  0x00, // 39 9
+ 355                  
+ 356                  hid_solidus_r,                  0x20, // 3A :
+ 357                  hid_solidus_l,                  0x20, // 3B ;
+ 358                  hid_wave_line,                  0x40, // 3C <
+ 359                  hid_0,                                  0x20, // 3D =
+ 360                  hid_1,                                  0x40, // 3E >
+ 361                  hid_underline,                  0x20, // 3F ?
+ 362                  hid_q,                                  0x40, // 40 @
+ 363                  
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 7   
+
+ 364                  hid_a,                                  0x20, // 41 A
+ 365                  hid_b,                                  0x20, // 42 B
+ 366                  hid_c,                                  0x20, // 43 C
+ 367                  hid_d,                                  0x20, // 44 D
+ 368                  hid_e,                                  0x20, // 45 E
+ 369                  hid_f,                                  0x20, // 46 F
+ 370                  hid_g,                                  0x20, // 47 G
+ 371                  hid_h,                                  0x20, // 48 H
+ 372                  hid_i,                                  0x20, // 49 I
+ 373                  hid_j,                                  0x20, // 4A J
+ 374                  hid_k,                                  0x20, // 4B K
+ 375                  hid_l,                                  0x20, // 4C L
+ 376                  hid_m,                                  0x20, // 4D M
+ 377                  hid_n,                                  0x20, // 4E N
+ 378                  hid_o,                                  0x20, // 4F O
+ 379                  hid_p,                                  0x20, // 50 P
+ 380                  hid_q,                                  0x20, // 51 Q
+ 381                  hid_r,                                  0x20, // 52 R
+ 382                  hid_s,                                  0x20, // 53 S
+ 383                  hid_t,                                  0x20, // 54 T
+ 384                  hid_u,                                  0x20, // 55 U
+ 385                  hid_v,                                  0x20, // 56 V
+ 386                  hid_w,                                  0x20, // 57 W
+ 387                  hid_x,                                  0x20, // 58 X
+ 388                  hid_y,                                  0x20, // 59 Y
+ 389                  hid_z,                                  0x20, // 5A Z
+ 390                  
+ 391                  hid_8,                                  0x40, // 5B [
+ 392                  hid_underline,                  0x40, // 5C "\"
+ 393                  hid_9,                                  0x40, // 5D ]
+ 394                  hid_3,                                  0x20, // 5E ^
+ 395                  hid_equal_mark,                 0x20, // 5F _
+ 396                  hid_solidus_l,                  0x40, // 60 `
+ 397                  
+ 398                  hid_a,                                  0x00, // 61 a
+ 399                  hid_b,                                  0x00, // 62 b
+ 400                  hid_c,                                  0x00, // 63 c
+ 401                  hid_d,                                  0x00, // 64 d
+ 402                  hid_e,                                  0x00, // 65 e
+ 403                  hid_f,                                  0x00, // 66 f
+ 404                  hid_g,                                  0x00, // 67 g
+ 405                  hid_h,                                  0x00, // 68 h
+ 406                  hid_quotation_mark,             0x00, // 69 i
+ 407                  hid_j,                                  0x00, // 6A j
+ 408                  hid_k,                                  0x00, // 6B k
+ 409                  hid_l,                                  0x00, // 6C l
+ 410                  hid_m,                                  0x00, // 6D m
+ 411                  hid_n,                                  0x00, // 6E n
+ 412                  hid_o,                                  0x00, // 6F o
+ 413                  hid_p,                                  0x00, // 70 p
+ 414                  hid_q,                                  0x00, // 71 q
+ 415                  hid_r,                                  0x00, // 72 r
+ 416                  hid_s,                                  0x00, // 73 s
+ 417                  hid_t,                                  0x00, // 74 t
+ 418                  hid_u,                                  0x00, // 75 u
+ 419                  hid_v,                                  0x00, // 76 v
+ 420                  hid_w,                                  0x00, // 77 w
+ 421                  hid_x,                                  0x00, // 78 x
+ 422                  hid_y,                                  0x00, // 79 y
+ 423                  hid_z,                                  0x00, // 7A z
+ 424                  
+ 425                  hid_7,                                  0x40, // 7B {
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 8   
+
+ 426                  hid_equal_mark,                 0x40, // 7C |
+ 427                  hid_0,                                  0x40, // 7D }
+ 428                  hid_braces_r,                   0x40, // 7E ~
+ 429                  hid_del,                                0x00, // 7F DEL
+ 430          };
+ 431          
+ 432          //---------------------------------------------------
+ 433          //          SPAIN   ASCII  <-> HID   TABLE
+ 434          //---------------------------------------------------
+ 435          code CONVERT lang_Spain[] = 
+ 436          {       
+ 437                  hid_space,                              0x00, // 20 SPACE
+ 438                  hid_1,                                  0x20, // 21 !
+ 439                  hid_2,                          0x20, // 22 "
+ 440                  hid_3,                                  0x40, // 23 #
+ 441                  hid_4,                                  0x20, // 24 $
+ 442                  hid_5,                                  0x20, // 25 %
+ 443                  hid_6,                                  0x20, // 26 &
+ 444                  hid_quotation_mark,             0x00, // 27 '
+ 445                  hid_8,                                  0x20, // 28 (
+ 446                  hid_9,                                  0x20, // 29 )
+ 447                  hid_braces_r,                   0x20, // 2A *
+ 448                  hid_braces_r,                   0x00, // 2B +
+ 449                  hid_comma,                          0x00, // 2C ,
+ 450                  hid_solidus_r,                  0x00, // 2D -
+ 451                  hid_full_stop,                  0x00, // 2E .
+ 452                  hid_7,                                  0x20, // 2F /
+ 453                  
+ 454                  hid_0,                                  0x00, // 30 0
+ 455                  hid_1,                                  0x00, // 31 1
+ 456                  hid_2,                                  0x00, // 32 2
+ 457                  hid_3,                                  0x00, // 33 3
+ 458                  hid_4,                                  0x00, // 34 4
+ 459                  hid_5,                                  0x00, // 35 5
+ 460                  hid_6,                                  0x00, // 36 6
+ 461                  hid_7,                                  0x00, // 37 7
+ 462                  hid_8,                                  0x00, // 38 8
+ 463                  hid_9,                                  0x00, // 39 9
+ 464                  
+ 465                  hid_full_stop,                  0x20, // 3A :
+ 466                  hid_comma,                          0x20, // 3B ;
+ 467                  hid_k45,                            0x00, // 3C <
+ 468                  hid_0,                                  0x20, // 3D =
+ 469                  hid_k45,                                0x20, // 3E >
+ 470                  hid_underline,                  0x20, // 3F ?
+ 471                  hid_2,                                  0x40, // 40 @
+ 472                  
+ 473                  hid_a,                                  0x20, // 41 A
+ 474                  hid_b,                                  0x20, // 42 B
+ 475                  hid_c,                                  0x20, // 43 C
+ 476                  hid_d,                                  0x20, // 44 D
+ 477                  hid_e,                                  0x20, // 45 E
+ 478                  hid_f,                                  0x20, // 46 F
+ 479                  hid_g,                                  0x20, // 47 G
+ 480                  hid_h,                                  0x20, // 48 H
+ 481                  hid_i,                                  0x20, // 49 I
+ 482                  hid_j,                                  0x20, // 4A J
+ 483                  hid_k,                                  0x20, // 4B K
+ 484                  hid_l,                                  0x20, // 4C L
+ 485                  hid_m,                                  0x20, // 4D M
+ 486                  hid_n,                                  0x20, // 4E N
+ 487                  hid_o,                                  0x20, // 4F O
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 9   
+
+ 488                  hid_p,                                  0x20, // 50 P
+ 489                  hid_q,                                  0x20, // 51 Q
+ 490                  hid_r,                                  0x20, // 52 R
+ 491                  hid_s,                                  0x20, // 53 S
+ 492                  hid_t,                                  0x20, // 54 T
+ 493                  hid_u,                                  0x20, // 55 U
+ 494                  hid_v,                                  0x20, // 56 V
+ 495                  hid_w,                                  0x20, // 57 W
+ 496                  hid_x,                                  0x20, // 58 X
+ 497                  hid_y,                                  0x20, // 59 Y
+ 498                  hid_z,                                  0x20, // 5A Z
+ 499                  
+ 500                  hid_braces_l,                   0x40, // 5B [
+ 501                  hid_wave_line,                  0x40, // 5C "\"
+ 502                  hid_braces_r,                   0x40, // 5D ]
+ 503                  hid_braces_l,                   0x20, // 5E ^
+ 504                  hid_solidus_r,                  0x20, // 5F _
+ 505                  hid_braces_l,                   0x00, // 60 `
+ 506                  
+ 507                  hid_a,                                  0x00, // 61 a
+ 508                  hid_b,                                  0x00, // 62 b
+ 509                  hid_c,                                  0x00, // 63 c
+ 510                  hid_d,                                  0x00, // 64 d
+ 511                  hid_e,                                  0x00, // 65 e
+ 512                  hid_f,                                  0x00, // 66 f
+ 513                  hid_g,                                  0x00, // 67 g
+ 514                  hid_h,                                  0x00, // 68 h
+ 515                  hid_i,                                  0x00, // 69 i
+ 516                  hid_j,                                  0x00, // 6A j
+ 517                  hid_k,                                  0x00, // 6B k
+ 518                  hid_l,                                  0x00, // 6C l
+ 519                  hid_m,                                  0x00, // 6D m
+ 520                  hid_n,                                  0x00, // 6E n
+ 521                  hid_o,                                  0x00, // 6F o
+ 522                  hid_p,                                  0x00, // 70 p
+ 523                  hid_q,                                  0x00, // 71 q
+ 524                  hid_r,                                  0x00, // 72 r
+ 525                  hid_s,                                  0x00, // 73 s
+ 526                  hid_t,                                  0x00, // 74 t
+ 527                  hid_u,                                  0x00, // 75 u
+ 528                  hid_v,                                  0x00, // 76 v
+ 529                  hid_w,                                  0x00, // 77 w
+ 530                  hid_x,                                  0x00, // 78 x
+ 531                  hid_y,                                  0x00, // 79 y
+ 532                  hid_z,                                  0x00, // 7A z
+ 533                  
+ 534                  hid_quotation_mark,             0x40, // 7B {
+ 535                  hid_1,                          0x40, // 7C |
+ 536                  hid_solidus_l,                  0x40, // 7D }
+ 537                  hid_4,                          0x40, // 7E ~
+ 538                  hid_del,                                0x00, // 7F DEL
+ 539          };
+ 540          
+ 541          //---------------------------------------------------
+ 542          //          PORTUGAL   ASCII  <-> HID   TABLE
+ 543          //---------------------------------------------------
+ 544          code CONVERT lang_Portugal[] = 
+ 545          {       
+ 546                  hid_space,                              0x00, // 20 SPACE
+ 547                  hid_1,                                  0x20, // 21 !
+ 548                  hid_2,                          0x20, // 22 "
+ 549                  hid_3,                                  0x20, // 23 #
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 10  
+
+ 550                  hid_4,                                  0x20, // 24 $
+ 551                  hid_5,                                  0x20, // 25 %
+ 552                  hid_6,                                  0x20, // 26 &
+ 553                  hid_underline,              0x00, // 27 '
+ 554                  hid_8,                                  0x20, // 28 (
+ 555                  hid_9,                                  0x20, // 29 )
+ 556                  hid_braces_l,                   0x20, // 2A *
+ 557                  hid_braces_l,                   0x00, // 2B +
+ 558                  hid_comma,                          0x00, // 2C ,
+ 559                  hid_solidus_r,                  0x00, // 2D -
+ 560                  hid_full_stop,                  0x00, // 2E .
+ 561                  hid_7,                                  0x20, // 2F /
+ 562                  
+ 563                  hid_0,                                  0x00, // 30 0
+ 564                  hid_1,                                  0x00, // 31 1
+ 565                  hid_2,                                  0x00, // 32 2
+ 566                  hid_3,                                  0x00, // 33 3
+ 567                  hid_4,                                  0x00, // 34 4
+ 568                  hid_5,                                  0x00, // 35 5
+ 569                  hid_6,                                  0x00, // 36 6
+ 570                  hid_7,                                  0x00, // 37 7
+ 571                  hid_8,                                  0x00, // 38 8
+ 572                  hid_9,                                  0x00, // 39 9
+ 573                  
+ 574                  hid_full_stop,                  0x20, // 3A :
+ 575                  hid_comma,                          0x20, // 3B ;
+ 576                  hid_k45,                            0x00, // 3C <
+ 577                  hid_0,                                  0x20, // 3D =
+ 578                  hid_k45,                                0x20, // 3E >
+ 579                  hid_underline,                  0x20, // 3F ?
+ 580                  hid_2,                                  0x40, // 40 @
+ 581                  
+ 582                  hid_a,                                  0x20, // 41 A
+ 583                  hid_b,                                  0x20, // 42 B
+ 584                  hid_c,                                  0x20, // 43 C
+ 585                  hid_d,                                  0x20, // 44 D
+ 586                  hid_e,                                  0x20, // 45 E
+ 587                  hid_f,                                  0x20, // 46 F
+ 588                  hid_g,                                  0x20, // 47 G
+ 589                  hid_h,                                  0x20, // 48 H
+ 590                  hid_i,                                  0x20, // 49 I
+ 591                  hid_j,                                  0x20, // 4A J
+ 592                  hid_k,                                  0x20, // 4B K
+ 593                  hid_l,                                  0x20, // 4C L
+ 594                  hid_m,                                  0x20, // 4D M
+ 595                  hid_n,                                  0x20, // 4E N
+ 596                  hid_o,                                  0x20, // 4F O
+ 597                  hid_p,                                  0x20, // 50 P
+ 598                  hid_q,                                  0x20, // 51 Q
+ 599                  hid_r,                                  0x20, // 52 R
+ 600                  hid_s,                                  0x20, // 53 S
+ 601                  hid_t,                                  0x20, // 54 T
+ 602                  hid_u,                                  0x20, // 55 U
+ 603                  hid_v,                                  0x20, // 56 V
+ 604                  hid_w,                                  0x20, // 57 W
+ 605                  hid_x,                                  0x20, // 58 X
+ 606                  hid_y,                                  0x20, // 59 Y
+ 607                  hid_z,                                  0x20, // 5A Z
+ 608                  
+ 609                  hid_8,                          0x40, // 5B [
+ 610                  hid_wave_line,                  0x00, // 5C "\"
+ 611                  hid_9,                          0x40, // 5D ]
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 11  
+
+ 612                  hid_solidus_l,                  0x20, // 5E ^
+ 613                  hid_solidus_r,                  0x20, // 5F _
+ 614                  hid_braces_r,                   0x20, // 60 `
+ 615                  
+ 616                  hid_a,                                  0x00, // 61 a
+ 617                  hid_b,                                  0x00, // 62 b
+ 618                  hid_c,                                  0x00, // 63 c
+ 619                  hid_d,                                  0x00, // 64 d
+ 620                  hid_e,                                  0x00, // 65 e
+ 621                  hid_f,                                  0x00, // 66 f
+ 622                  hid_g,                                  0x00, // 67 g
+ 623                  hid_h,                                  0x00, // 68 h
+ 624                  hid_i,                                  0x00, // 69 i
+ 625                  hid_j,                                  0x00, // 6A j
+ 626                  hid_k,                                  0x00, // 6B k
+ 627                  hid_l,                                  0x00, // 6C l
+ 628                  hid_m,                                  0x00, // 6D m
+ 629                  hid_n,                                  0x00, // 6E n
+ 630                  hid_o,                                  0x00, // 6F o
+ 631                  hid_p,                                  0x00, // 70 p
+ 632                  hid_q,                                  0x00, // 71 q
+ 633                  hid_r,                                  0x00, // 72 r
+ 634                  hid_s,                                  0x00, // 73 s
+ 635                  hid_t,                                  0x00, // 74 t
+ 636                  hid_u,                                  0x00, // 75 u
+ 637                  hid_v,                                  0x00, // 76 v
+ 638                  hid_w,                                  0x00, // 77 w
+ 639                  hid_x,                                  0x00, // 78 x
+ 640                  hid_y,                                  0x00, // 79 y
+ 641                  hid_z,                                  0x00, // 7A z
+ 642                  
+ 643                  hid_7,                      0x40, // 7B {
+ 644                  hid_wave_line,              0x20, // 7C |
+ 645                  hid_0,                          0x40, // 7D }
+ 646                  hid_solidus_l,                  0x00, // 7E ~
+ 647                  hid_del,                                0x00, // 7F DEL
+ 648          };
+ 649          
+ 650          //---------------------------------------------------
+ 651          //          FRANCE   ASCII  <-> HID   TABLE
+ 652          //---------------------------------------------------
+ 653          code CONVERT lang_France[] = 
+ 654          {       
+ 655                  hid_space,                              0x00, // 20 SPACE
+ 656                  hid_solidus_r,                  0x00, // 21 !
+ 657                  hid_3,                          0x00, // 22 "
+ 658                  hid_3,                                  0x40, // 23 #
+ 659                  hid_braces_r,                   0x00, // 24 $
+ 660                  hid_quotation_mark,             0x20, // 25 %
+ 661                  hid_1,                                  0x00, // 26 &
+ 662                  hid_4,                      0x00, // 27 '
+ 663                  hid_5,                                  0x00, // 28 (
+ 664                  hid_underline,                  0x00, // 29 )
+ 665                  hid_k42,                            0x00, // 2A *
+ 666                  hid_equal_mark,                 0x20, // 2B +
+ 667                  hid_m,                          0x00, // 2C ,
+ 668                  hid_6,                          0x00, // 2D -
+ 669                  hid_comma,                          0x20, // 2E .
+ 670                  hid_full_stop,                  0x20, // 2F /
+ 671                  
+ 672                  hid_0,                                  0x20, // 30 0
+ 673                  hid_1,                                  0x20, // 31 1
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 12  
+
+ 674                  hid_2,                                  0x20, // 32 2
+ 675                  hid_3,                                  0x20, // 33 3
+ 676                  hid_4,                                  0x20, // 34 4
+ 677                  hid_5,                                  0x20, // 35 5
+ 678                  hid_6,                                  0x20, // 36 6
+ 679                  hid_7,                                  0x20, // 37 7
+ 680                  hid_8,                                  0x20, // 38 8
+ 681                  hid_9,                                  0x20, // 39 9
+ 682                  
+ 683                  hid_full_stop,                  0x00, // 3A :
+ 684                  hid_comma,                          0x00, // 3B ;
+ 685                  hid_k45,                            0x00, // 3C <
+ 686                  hid_equal_mark,                 0x00, // 3D =
+ 687                  hid_k45,                                0x20, // 3E >
+ 688                  hid_m,                          0x20, // 3F ?
+ 689                  hid_0,                                  0x40, // 40 @
+ 690                  
+ 691                  hid_q,                                  0x20, // 41 A
+ 692                  hid_b,                                  0x20, // 42 B
+ 693                  hid_c,                                  0x20, // 43 C
+ 694                  hid_d,                                  0x20, // 44 D
+ 695                  hid_e,                                  0x20, // 45 E
+ 696                  hid_f,                                  0x20, // 46 F
+ 697                  hid_g,                                  0x20, // 47 G
+ 698                  hid_h,                                  0x20, // 48 H
+ 699                  hid_i,                                  0x20, // 49 I
+ 700                  hid_j,                                  0x20, // 4A J
+ 701                  hid_k,                                  0x20, // 4B K
+ 702                  hid_l,                                  0x20, // 4C L
+ 703                  hid_semicolon,                  0x20, // 4D M
+ 704                  hid_n,                                  0x20, // 4E N
+ 705                  hid_o,                                  0x20, // 4F O
+ 706                  hid_p,                                  0x20, // 50 P
+ 707                  hid_a,                                  0x20, // 51 Q
+ 708                  hid_r,                                  0x20, // 52 R
+ 709                  hid_s,                                  0x20, // 53 S
+ 710                  hid_t,                                  0x20, // 54 T
+ 711                  hid_u,                                  0x20, // 55 U
+ 712                  hid_v,                                  0x20, // 56 V
+ 713                  hid_z,                                  0x20, // 57 W
+ 714                  hid_x,                                  0x20, // 58 X
+ 715                  hid_y,                                  0x20, // 59 Y
+ 716                  hid_w,                                  0x20, // 5A Z
+ 717                  
+ 718                  hid_5,                          0x40, // 5B [
+ 719                  hid_8,                          0x40, // 5C "\"
+ 720                  hid_underline,                  0x40, // 5D ]
+ 721                  hid_9,                          0x40, // 5E ^
+ 722                  hid_8,                          0x00, // 5F _
+ 723                  hid_7,                          0x40, // 60 `
+ 724                  
+ 725                  hid_q,                                  0x00, // 61 a
+ 726                  hid_b,                                  0x00, // 62 b
+ 727                  hid_c,                                  0x00, // 63 c
+ 728                  hid_d,                                  0x00, // 64 d
+ 729                  hid_e,                                  0x00, // 65 e
+ 730                  hid_f,                                  0x00, // 66 f
+ 731                  hid_g,                                  0x00, // 67 g
+ 732                  hid_h,                                  0x00, // 68 h
+ 733                  hid_i,                                  0x00, // 69 i
+ 734                  hid_j,                                  0x00, // 6A j
+ 735                  hid_k,                                  0x00, // 6B k
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 13  
+
+ 736                  hid_l,                                  0x00, // 6C l
+ 737                  hid_semicolon,                  0x00, // 6D m
+ 738                  hid_n,                                  0x00, // 6E n
+ 739                  hid_o,                                  0x00, // 6F o
+ 740                  hid_p,                                  0x00, // 70 p
+ 741                  hid_a,                                  0x00, // 71 q
+ 742                  hid_r,                                  0x00, // 72 r
+ 743                  hid_s,                                  0x00, // 73 s
+ 744                  hid_t,                                  0x00, // 74 t
+ 745                  hid_u,                                  0x00, // 75 u
+ 746                  hid_v,                                  0x00, // 76 v
+ 747                  hid_z,                                  0x00, // 77 w
+ 748                  hid_x,                                  0x00, // 78 x
+ 749                  hid_y,                                  0x00, // 79 y
+ 750                  hid_w,                                  0x00, // 7A z
+ 751                  
+ 752                  hid_4,                      0x40, // 7B {
+ 753                  hid_6,                      0x40, // 7C |
+ 754                  hid_equal_mark,                 0x40, // 7D }
+ 755                  hid_2,                          0x40, // 7E ~
+ 756                  hid_del,                                0x00, // 7F DEL
+ 757          };
+ 758          
+ 759          //---------------------------------------------------
+ 760          //          GERMANY   ASCII  <-> HID   TABLE
+ 761          //---------------------------------------------------
+ 762          code CONVERT lang_Germany[] = 
+ 763          {       
+ 764                  hid_space,                              0x00, // 20 SPACE
+ 765                  hid_1,                                  0x20, // 21 !
+ 766                  hid_2,                          0x20, // 22 "
+ 767                  hid_k42,                                0x00, // 23 #
+ 768                  hid_4,                                  0x20, // 24 $
+ 769                  hid_5,                                  0x20, // 25 %
+ 770                  hid_6,                                  0x20, // 26 &
+ 771                  hid_k42,                        0x20, // 27 '
+ 772                  hid_8,                                  0x20, // 28 (
+ 773                  hid_9,                                  0x20, // 29 )
+ 774                  hid_braces_r,                   0x20, // 2A *
+ 775                  hid_braces_r,                   0x00, // 2B +
+ 776                  hid_comma,                          0x00, // 2C ,
+ 777                  hid_solidus_r,                  0x00, // 2D -
+ 778                  hid_full_stop,                  0x00, // 2E .
+ 779                  hid_7,                                  0x20, // 2F /
+ 780                  
+ 781                  hid_0,                                  0x00, // 30 0
+ 782                  hid_1,                                  0x00, // 31 1
+ 783                  hid_2,                                  0x00, // 32 2
+ 784                  hid_3,                                  0x00, // 33 3
+ 785                  hid_4,                                  0x00, // 34 4
+ 786                  hid_5,                                  0x00, // 35 5
+ 787                  hid_6,                                  0x00, // 36 6
+ 788                  hid_7,                                  0x00, // 37 7
+ 789                  hid_8,                                  0x00, // 38 8
+ 790                  hid_9,                                  0x00, // 39 9
+ 791                  
+ 792                  hid_full_stop,                  0x20, // 3A :
+ 793                  hid_comma,                          0x20, // 3B ;
+ 794                  hid_k45,                            0x00, // 3C <
+ 795                  hid_0,                                  0x20, // 3D =
+ 796                  hid_k45,                                0x20, // 3E >
+ 797                  hid_underline,                  0x20, // 3F ?
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 14  
+
+ 798                  hid_q,                                  0x40, // 40 @
+ 799                  
+ 800                  hid_a,                                  0x20, // 41 A
+ 801                  hid_b,                                  0x20, // 42 B
+ 802                  hid_c,                                  0x20, // 43 C
+ 803                  hid_d,                                  0x20, // 44 D
+ 804                  hid_e,                                  0x20, // 45 E
+ 805                  hid_f,                                  0x20, // 46 F
+ 806                  hid_g,                                  0x20, // 47 G
+ 807                  hid_h,                                  0x20, // 48 H
+ 808                  hid_i,                                  0x20, // 49 I
+ 809                  hid_j,                                  0x20, // 4A J
+ 810                  hid_k,                                  0x20, // 4B K
+ 811                  hid_l,                                  0x20, // 4C L
+ 812                  hid_m,                                  0x20, // 4D M
+ 813                  hid_n,                                  0x20, // 4E N
+ 814                  hid_o,                                  0x20, // 4F O
+ 815                  hid_p,                                  0x20, // 50 P
+ 816                  hid_q,                                  0x20, // 51 Q
+ 817                  hid_r,                                  0x20, // 52 R
+ 818                  hid_s,                                  0x20, // 53 S
+ 819                  hid_t,                                  0x20, // 54 T
+ 820                  hid_u,                                  0x20, // 55 U
+ 821                  hid_v,                                  0x20, // 56 V
+ 822                  hid_w,                                  0x20, // 57 W
+ 823                  hid_x,                                  0x20, // 58 X
+ 824                  hid_z,                                  0x20, // 59 Y
+ 825                  hid_y,                                  0x20, // 5A Z
+ 826                  
+ 827                  hid_8,                          0x40, // 5B [
+ 828                  hid_underline,                  0x40, // 5C "\"
+ 829                  hid_9,                          0x40, // 5D ]
+ 830                  hid_wave_line,                  0x00, // 5E ^
+ 831                  hid_solidus_r,                  0x20, // 5F _
+ 832                  hid_equal_mark,                 0x20, // 60 `
+ 833                  
+ 834                  hid_a,                                  0x00, // 61 a
+ 835                  hid_b,                                  0x00, // 62 b
+ 836                  hid_c,                                  0x00, // 63 c
+ 837                  hid_d,                                  0x00, // 64 d
+ 838                  hid_e,                                  0x00, // 65 e
+ 839                  hid_f,                                  0x00, // 66 f
+ 840                  hid_g,                                  0x00, // 67 g
+ 841                  hid_h,                                  0x00, // 68 h
+ 842                  hid_i,                                  0x00, // 69 i
+ 843                  hid_j,                                  0x00, // 6A j
+ 844                  hid_k,                                  0x00, // 6B k
+ 845                  hid_l,                                  0x00, // 6C l
+ 846                  hid_m,                                  0x00, // 6D m
+ 847                  hid_n,                                  0x00, // 6E n
+ 848                  hid_o,                                  0x00, // 6F o
+ 849                  hid_p,                                  0x00, // 70 p
+ 850                  hid_q,                                  0x00, // 71 q
+ 851                  hid_r,                                  0x00, // 72 r
+ 852                  hid_s,                                  0x00, // 73 s
+ 853                  hid_t,                                  0x00, // 74 t
+ 854                  hid_u,                                  0x00, // 75 u
+ 855                  hid_v,                                  0x00, // 76 v
+ 856                  hid_w,                                  0x00, // 77 w
+ 857                  hid_x,                                  0x00, // 78 x
+ 858                  hid_z,                                  0x00, // 79 y
+ 859                  hid_y,                                  0x00, // 7A z
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 15  
+
+ 860                  
+ 861                  hid_7,                      0x40, // 7B {
+ 862                  hid_k45,                        0x40, // 7C |
+ 863                  hid_0,                          0x40, // 7D }
+ 864                  hid_braces_r,                   0x40, // 7E ~
+ 865                  hid_del,                                0x00, // 7F DEL
+ 866          };
+ 867          
+ 868          //---------------------------------------------------
+ 869          //          ITALY   ASCII  <-> HID   TABLE
+ 870          //---------------------------------------------------
+ 871          code CONVERT lang_Italy[] = 
+ 872          {       
+ 873                  hid_space,                              0x00, // 20 SPACE
+ 874                  hid_1,                                  0x20, // 21 !
+ 875                  hid_2,                          0x20, // 22 "
+ 876                  hid_quotation_mark,             0x40, // 23 #
+ 877                  hid_4,                                  0x20, // 24 $
+ 878                  hid_5,                                  0x20, // 25 %
+ 879                  hid_6,                                  0x20, // 26 &
+ 880                  hid_underline,              0x00, // 27 '
+ 881                  hid_8,                                  0x20, // 28 (
+ 882                  hid_9,                                  0x20, // 29 )
+ 883                  hid_braces_r,                   0x20, // 2A *
+ 884                  hid_braces_r,                   0x00, // 2B +
+ 885                  hid_comma,                          0x00, // 2C ,
+ 886                  hid_solidus_r,                  0x00, // 2D -
+ 887                  hid_full_stop,                  0x00, // 2E .
+ 888                  hid_7,                                  0x20, // 2F /
+ 889                  
+ 890                  hid_0,                                  0x00, // 30 0
+ 891                  hid_1,                                  0x00, // 31 1
+ 892                  hid_2,                                  0x00, // 32 2
+ 893                  hid_3,                                  0x00, // 33 3
+ 894                  hid_4,                                  0x00, // 34 4
+ 895                  hid_5,                                  0x00, // 35 5
+ 896                  hid_6,                                  0x00, // 36 6
+ 897                  hid_7,                                  0x00, // 37 7
+ 898                  hid_8,                                  0x00, // 38 8
+ 899                  hid_9,                                  0x00, // 39 9
+ 900                  
+ 901                  hid_full_stop,                  0x20, // 3A :
+ 902                  hid_comma,                          0x20, // 3B ;
+ 903                  hid_k45,                            0x00, // 3C <
+ 904                  hid_0,                                  0x20, // 3D =
+ 905                  hid_k45,                                0x20, // 3E >
+ 906                  hid_underline,                  0x20, // 3F ?
+ 907                  hid_semicolon,                  0x40, // 40 @
+ 908                  
+ 909                  hid_a,                                  0x20, // 41 A
+ 910                  hid_b,                                  0x20, // 42 B
+ 911                  hid_c,                                  0x20, // 43 C
+ 912                  hid_d,                                  0x20, // 44 D
+ 913                  hid_e,                                  0x20, // 45 E
+ 914                  hid_f,                                  0x20, // 46 F
+ 915                  hid_g,                                  0x20, // 47 G
+ 916                  hid_h,                                  0x20, // 48 H
+ 917                  hid_i,                                  0x20, // 49 I
+ 918                  hid_j,                                  0x20, // 4A J
+ 919                  hid_k,                                  0x20, // 4B K
+ 920                  hid_l,                                  0x20, // 4C L
+ 921                  hid_m,                                  0x20, // 4D M
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 16  
+
+ 922                  hid_n,                                  0x20, // 4E N
+ 923                  hid_o,                                  0x20, // 4F O
+ 924                  hid_p,                                  0x20, // 50 P
+ 925                  hid_q,                                  0x20, // 51 Q
+ 926                  hid_r,                                  0x20, // 52 R
+ 927                  hid_s,                                  0x20, // 53 S
+ 928                  hid_t,                                  0x20, // 54 T
+ 929                  hid_u,                                  0x20, // 55 U
+ 930                  hid_v,                                  0x20, // 56 V
+ 931                  hid_w,                                  0x20, // 57 W
+ 932                  hid_x,                                  0x20, // 58 X
+ 933                  hid_y,                                  0x20, // 59 Y
+ 934                  hid_z,                                  0x20, // 5A Z
+ 935                  
+ 936                  hid_braces_l,                   0x40, // 5B [
+ 937                  hid_wave_line,                  0x00, // 5C "\"
+ 938                  hid_braces_r,                   0x40, // 5D ]
+ 939                  hid_equal_mark,                 0x20, // 5E ^
+ 940                  hid_solidus_r,                  0x20, // 5F _
+ 941                  0,                                  0x00, // 60 `
+ 942                  
+ 943                  hid_a,                                  0x00, // 61 a
+ 944                  hid_b,                                  0x00, // 62 b
+ 945                  hid_c,                                  0x00, // 63 c
+ 946                  hid_d,                                  0x00, // 64 d
+ 947                  hid_e,                                  0x00, // 65 e
+ 948                  hid_f,                                  0x00, // 66 f
+ 949                  hid_g,                                  0x00, // 67 g
+ 950                  hid_h,                                  0x00, // 68 h
+ 951                  hid_i,                                  0x00, // 69 i
+ 952                  hid_j,                                  0x00, // 6A j
+ 953                  hid_k,                                  0x00, // 6B k
+ 954                  hid_l,                                  0x00, // 6C l
+ 955                  hid_m,                                  0x00, // 6D m
+ 956                  hid_n,                                  0x00, // 6E n
+ 957                  hid_o,                                  0x00, // 6F o
+ 958                  hid_p,                                  0x00, // 70 p
+ 959                  hid_q,                                  0x00, // 71 q
+ 960                  hid_r,                                  0x00, // 72 r
+ 961                  hid_s,                                  0x00, // 73 s
+ 962                  hid_t,                                  0x00, // 74 t
+ 963                  hid_u,                                  0x00, // 75 u
+ 964                  hid_v,                                  0x00, // 76 v
+ 965                  hid_w,                                  0x00, // 77 w
+ 966                  hid_x,                                  0x00, // 78 x
+ 967                  hid_y,                                  0x00, // 79 y
+ 968                  hid_z,                                  0x00, // 7A z
+ 969                  
+ 970                  0,                              0x00, // 7B {
+ 971                  hid_wave_line,              0x20, // 7C |
+ 972                  0,                                  0x00, // 7D }
+ 973                  0,                                  0x00, // 7E ~
+ 974                  hid_del,                                0x00, // 7F DEL
+ 975          };
+ 976          
+ 977          //---------------------------------------------------
+ 978          //          UK   ASCII <-> HID   TABLE
+ 979          //---------------------------------------------------
+ 980          code CONVERT lang_UK[] = 
+ 981          {       
+ 982                  hid_space,                              0x00, // 20 SPACE
+ 983                  hid_1,                                  0x20, // 21 !
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 17  
+
+ 984                  hid_2,                      0x20, // 22 "
+ 985                  hid_solidus_l,                  0x00, // 23 #
+ 986                  hid_4,                                  0x20, // 24 $
+ 987                  hid_5,                                  0x20, // 25 %
+ 988                  hid_7,                                  0x20, // 26 &
+ 989                  hid_quotation_mark,             0x00, // 27 '
+ 990                  hid_9,                                  0x20, // 28 (
+ 991                  hid_0,                                  0x20, // 29 )
+ 992                  hid_8,                                  0x20, // 2A *
+ 993                  hid_equal_mark,                 0x20, // 2B +
+ 994                  hid_comma,                              0x00, // 2C ,
+ 995                  hid_underline,                  0x00, // 2D -
+ 996                  hid_full_stop,                  0x00, // 2E .
+ 997                  hid_solidus_r,                  0x00, // 2F /
+ 998                  
+ 999                  hid_0,                                  0x00, // 30 0
+1000                  hid_1,                                  0x00, // 31 1
+1001                  hid_2,                                  0x00, // 32 2
+1002                  hid_3,                                  0x00, // 33 3
+1003                  hid_4,                                  0x00, // 34 4
+1004                  hid_5,                                  0x00, // 35 5
+1005                  hid_6,                                  0x00, // 36 6
+1006                  hid_7,                                  0x00, // 37 7
+1007                  hid_8,                                  0x00, // 38 8
+1008                  hid_9,                                  0x00, // 39 9
+1009                  
+1010                  hid_semicolon,                  0x20, // 3A :
+1011                  hid_semicolon,                  0x00, // 3B ;
+1012                  hid_comma,                              0x20, // 3C <
+1013                  hid_equal_mark,                 0x00, // 3D =
+1014                  hid_full_stop,                  0x20, // 3E >
+1015                  hid_solidus_r,                  0x20, // 3F ?
+1016                  hid_quotation_mark,             0x20, // 40 @
+1017                  
+1018                  hid_a,                                  0x20, // 41 A
+1019                  hid_b,                                  0x20, // 42 B
+1020                  hid_c,                                  0x20, // 43 C
+1021                  hid_d,                                  0x20, // 44 D
+1022                  hid_e,                                  0x20, // 45 E
+1023                  hid_f,                                  0x20, // 46 F
+1024                  hid_g,                                  0x20, // 47 G
+1025                  hid_h,                                  0x20, // 48 H
+1026                  hid_i,                                  0x20, // 49 I
+1027                  hid_j,                                  0x20, // 4A J
+1028                  hid_k,                                  0x20, // 4B K
+1029                  hid_l,                                  0x20, // 4C L
+1030                  hid_m,                                  0x20, // 4D M
+1031                  hid_n,                                  0x20, // 4E N
+1032                  hid_o,                                  0x20, // 4F O
+1033                  hid_p,                                  0x20, // 50 P
+1034                  hid_q,                                  0x20, // 51 Q
+1035                  hid_r,                                  0x20, // 52 R
+1036                  hid_s,                                  0x20, // 53 S
+1037                  hid_t,                                  0x20, // 54 T
+1038                  hid_u,                                  0x20, // 55 U
+1039                  hid_v,                                  0x20, // 56 V
+1040                  hid_w,                                  0x20, // 57 W
+1041                  hid_x,                                  0x20, // 58 X
+1042                  hid_y,                                  0x20, // 59 Y
+1043                  hid_z,                                  0x20, // 5A Z
+1044                  
+1045                  hid_braces_l,                   0x00, // 5B [
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 18  
+
+1046                  hid_k45,                            0x00, // 5C "\"
+1047                  hid_braces_r,                   0x00, // 5D ]
+1048                  hid_6,                                  0x20, // 5E ^
+1049                  hid_underline,                  0x20, // 5F _
+1050                  hid_wave_line,                  0x00, // 60 `
+1051                  
+1052                  hid_a,                                  0x00, // 61 a
+1053                  hid_b,                                  0x00, // 62 b
+1054                  hid_c,                                  0x00, // 63 c
+1055                  hid_d,                                  0x00, // 64 d
+1056                  hid_e,                                  0x00, // 65 e
+1057                  hid_f,                                  0x00, // 66 f
+1058                  hid_g,                                  0x00, // 67 g
+1059                  hid_h,                                  0x00, // 68 h
+1060                  hid_i,                                  0x00, // 69 i
+1061                  hid_j,                                  0x00, // 6A j
+1062                  hid_k,                                  0x00, // 6B k
+1063                  hid_l,                                  0x00, // 6C l
+1064                  hid_m,                                  0x00, // 6D m
+1065                  hid_n,                                  0x00, // 6E n
+1066                  hid_o,                                  0x00, // 6F o
+1067                  hid_p,                                  0x00, // 70 p
+1068                  hid_q,                                  0x00, // 71 q
+1069                  hid_r,                                  0x00, // 72 r
+1070                  hid_s,                                  0x00, // 73 s
+1071                  hid_t,                                  0x00, // 74 t
+1072                  hid_u,                                  0x00, // 75 u
+1073                  hid_v,                                  0x00, // 76 v
+1074                  hid_w,                                  0x00, // 77 w
+1075                  hid_x,                                  0x00, // 78 x
+1076                  hid_y,                                  0x00, // 79 y
+1077                  hid_z,                                  0x00, // 7A z
+1078                  
+1079                  hid_braces_l,                   0x20, // 7B {
+1080                  hid_k45,                            0x20, // 7C |
+1081                  hid_braces_r,                   0x20, // 7D }
+1082                  hid_solidus_l,                  0x20, // 7E ~
+1083                  hid_del,                                0x00, // 7F DEL
+1084          };
+1085          
+1086          //---------------------------------------------------
+1087          //          CZECH   ASCII  <-> HID   TABLE
+1088          //---------------------------------------------------
+1089          code CONVERT lang_Czech[] = 
+1090          {       
+1091                  hid_space,                              0x00, // 20 SPACE
+1092                  hid_quotation_mark,             0x20, // 21 !
+1093                  hid_semicolon,                  0x20, // 22 "
+1094                  hid_x,                                  0x40, // 23 #
+1095                  hid_semicolon,                  0x40, // 24 $
+1096                  hid_underline,                  0x20, // 25 %
+1097                  hid_c,                                  0x40, // 26 &
+1098                  hid_solidus_l,              0x20, // 27 '
+1099                  hid_braces_r,                   0x20, // 28 (
+1100                  hid_braces_r,                   0x00, // 29 )
+1101                  hid_solidus_r,                  0x40, // 2A *
+1102                  hid_1,                                  0x00, // 2B +
+1103                  hid_comma,                          0x00, // 2C ,
+1104                  hid_solidus_r,                  0x00, // 2D -
+1105                  hid_full_stop,                  0x00, // 2E .
+1106                  hid_braces_l,                   0x20, // 2F /
+1107                  
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 19  
+
+1108                  hid_0,                                  0x20, // 30 0
+1109                  hid_1,                                  0x20, // 31 1
+1110                  hid_2,                                  0x20, // 32 2
+1111                  hid_3,                                  0x20, // 33 3
+1112                  hid_4,                                  0x20, // 34 4
+1113                  hid_5,                                  0x20, // 35 5
+1114                  hid_6,                                  0x20, // 36 6
+1115                  hid_7,                                  0x20, // 37 7
+1116                  hid_8,                                  0x20, // 38 8
+1117                  hid_9,                                  0x20, // 39 9
+1118                  
+1119                  hid_full_stop,                  0x20, // 3A :
+1120                  hid_wave_line,                  0x00, // 3B ;
+1121                  hid_comma,                          0x40, // 3C <
+1122                  hid_underline,                  0x00, // 3D =
+1123                  hid_full_stop,                  0x40, // 3E >
+1124                  hid_comma,                              0x20, // 3F ?
+1125                  hid_v,                                  0x40, // 40 @
+1126                  
+1127                  hid_a,                                  0x20, // 41 A
+1128                  hid_b,                                  0x20, // 42 B
+1129                  hid_c,                                  0x20, // 43 C
+1130                  hid_d,                                  0x20, // 44 D
+1131                  hid_e,                                  0x20, // 45 E
+1132                  hid_f,                                  0x20, // 46 F
+1133                  hid_g,                                  0x20, // 47 G
+1134                  hid_h,                                  0x20, // 48 H
+1135                  hid_i,                                  0x20, // 49 I
+1136                  hid_j,                                  0x20, // 4A J
+1137                  hid_k,                                  0x20, // 4B K
+1138                  hid_l,                                  0x20, // 4C L
+1139                  hid_m,                                  0x20, // 4D M
+1140                  hid_n,                                  0x20, // 4E N
+1141                  hid_o,                                  0x20, // 4F O
+1142                  hid_p,                                  0x20, // 50 P
+1143                  hid_q,                                  0x20, // 51 Q
+1144                  hid_r,                                  0x20, // 52 R
+1145                  hid_s,                                  0x20, // 53 S
+1146                  hid_t,                                  0x20, // 54 T
+1147                  hid_u,                                  0x20, // 55 U
+1148                  hid_v,                                  0x20, // 56 V
+1149                  hid_w,                                  0x20, // 57 W
+1150                  hid_x,                                  0x20, // 58 X
+1151                  hid_z,                                  0x20, // 59 Y
+1152                  hid_y,                                  0x20, // 5A Z
+1153                  
+1154                  hid_f,                                  0x40, // 5B [
+1155                  hid_q,                                  0x40, // 5C "\"
+1156                  hid_g,                                  0x40, // 5D ]
+1157                  hid_3,                                  0x40, // 5E ^
+1158                  hid_solidus_r,                  0x20, // 5F _
+1159                  hid_7,                          0x40, // 60 `
+1160                  
+1161                  hid_a,                                  0x00, // 61 a
+1162                  hid_b,                                  0x00, // 62 b
+1163                  hid_c,                                  0x00, // 63 c
+1164                  hid_d,                                  0x00, // 64 d
+1165                  hid_e,                                  0x00, // 65 e
+1166                  hid_f,                                  0x00, // 66 f
+1167                  hid_g,                                  0x00, // 67 g
+1168                  hid_h,                                  0x00, // 68 h
+1169                  hid_i,                                  0x00, // 69 i
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 20  
+
+1170                  hid_j,                                  0x00, // 6A j
+1171                  hid_k,                                  0x00, // 6B k
+1172                  hid_l,                                  0x00, // 6C l
+1173                  hid_m,                                  0x00, // 6D m
+1174                  hid_n,                                  0x00, // 6E n
+1175                  hid_o,                                  0x00, // 6F o
+1176                  hid_p,                                  0x00, // 70 p
+1177                  hid_q,                                  0x00, // 71 q
+1178                  hid_r,                                  0x00, // 72 r
+1179                  hid_s,                                  0x00, // 73 s
+1180                  hid_t,                                  0x00, // 74 t
+1181                  hid_u,                                  0x00, // 75 u
+1182                  hid_v,                                  0x00, // 76 v
+1183                  hid_w,                                  0x00, // 77 w
+1184                  hid_x,                                  0x00, // 78 x
+1185                  hid_z,                                  0x00, // 79 y
+1186                  hid_y,                                  0x00, // 7A z
+1187                  
+1188                  hid_b,                      0x40, // 7B {
+1189                  hid_w,                      0x40, // 7C |
+1190                  hid_n,                          0x40, // 7D }
+1191                  hid_1,                          0x40, // 7E ~
+1192                  hid_del,                                0x00, // 7F DEL
+1193          };
+1194          
+1195          //---------------------------------------------------
+1196          //          JANPAN   ASCII <-> HID   TABLE
+1197          //---------------------------------------------------
+1198          code CONVERT lang_Japan[] = 
+1199          {
+1200                  hid_space,                              0x00, // 20 SPACE
+1201                  hid_1,                                  0x20, // 21 !
+1202                  hid_2,                                  0x20, // 22 "
+1203                  hid_3,                                  0x20, // 23 #
+1204                  hid_4,                                  0x20, // 24 $
+1205                  hid_5,                                  0x20, // 25 %
+1206                  hid_6,                                  0x20, // 26 &
+1207                  hid_7,                                  0x20, // 27 '
+1208                  hid_8,                                  0x20, // 28 (
+1209                  hid_9,                                  0x20, // 29 )
+1210                  hid_quotation_mark,             0x20, // 2A *
+1211                  hid_semicolon,                  0x20, // 2B +
+1212                  hid_comma,                              0x00, // 2C ,
+1213                  hid_underline,                  0x00, // 2D -
+1214                  hid_full_stop,                  0x00, // 2E .
+1215                  hid_solidus_r,                  0x00, // 2F /
+1216                  
+1217                  hid_0,                                  0x00, // 30 0
+1218                  hid_1,                                  0x00, // 31 1
+1219                  hid_2,                                  0x00, // 32 2
+1220                  hid_3,                                  0x00, // 33 3
+1221                  hid_4,                                  0x00, // 34 4
+1222                  hid_5,                                  0x00, // 35 5
+1223                  hid_6,                                  0x00, // 36 6
+1224                  hid_7,                                  0x00, // 37 7
+1225                  hid_8,                                  0x00, // 38 8
+1226                  hid_9,                                  0x00, // 39 9
+1227                  
+1228                  hid_quotation_mark,             0x00, // 3A :
+1229                  hid_semicolon,                  0x00, // 3B ;
+1230                  hid_comma,                              0x20, // 3C <
+1231                  hid_underline,                  0x20, // 3D =
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 21  
+
+1232                  hid_full_stop,                  0x20, // 3E >
+1233                  hid_solidus_r,                  0x20, // 3F ?
+1234                  hid_braces_l,                   0x00, // 40 @
+1235                  
+1236                  hid_a,                                  0x20, // 41 A
+1237                  hid_b,                                  0x20, // 42 B
+1238                  hid_c,                                  0x20, // 43 C
+1239                  hid_d,                                  0x20, // 44 D
+1240                  hid_e,                                  0x20, // 45 E
+1241                  hid_f,                                  0x20, // 46 F
+1242                  hid_g,                                  0x20, // 47 G
+1243                  hid_h,                                  0x20, // 48 H
+1244                  hid_i,                                  0x20, // 49 I
+1245                  hid_j,                                  0x20, // 4A J
+1246                  hid_k,                                  0x20, // 4B K
+1247                  hid_l,                                  0x20, // 4C L
+1248                  hid_m,                                  0x20, // 4D M
+1249                  hid_n,                                  0x20, // 4E N
+1250                  hid_o,                                  0x20, // 4F O
+1251                  hid_p,                                  0x20, // 50 P
+1252                  hid_q,                                  0x20, // 51 Q
+1253                  hid_r,                                  0x20, // 52 R
+1254                  hid_s,                                  0x20, // 53 S
+1255                  hid_t,                                  0x20, // 54 T
+1256                  hid_u,                                  0x20, // 55 U
+1257                  hid_v,                                  0x20, // 56 V
+1258                  hid_w,                                  0x20, // 57 W
+1259                  hid_x,                                  0x20, // 58 X
+1260                  hid_y,                                  0x20, // 59 Y
+1261                  hid_z,                                  0x20, // 5A Z
+1262                  
+1263                  hid_braces_r,                   0x00, // 5B [
+1264                  0x87,                                   0x00, // 5C "\"
+1265                  hid_solidus_l,                  0x00, // 5D ]
+1266                  hid_equal_mark,                 0x00, // 5E ^
+1267                  0x87,                                   0x20, // 5F _
+1268                  hid_braces_l,                   0x20, // 60 `
+1269                  
+1270                  hid_a,                                  0x00, // 61 a
+1271                  hid_b,                                  0x00, // 62 b
+1272                  hid_c,                                  0x00, // 63 c
+1273                  hid_d,                                  0x00, // 64 d
+1274                  hid_e,                                  0x00, // 65 e
+1275                  hid_f,                                  0x00, // 66 f
+1276                  hid_g,                                  0x00, // 67 g
+1277                  hid_h,                                  0x00, // 68 h
+1278                  hid_i,                                  0x00, // 69 i
+1279                  hid_j,                                  0x00, // 6A j
+1280                  hid_k,                                  0x00, // 6B k
+1281                  hid_l,                                  0x00, // 6C l
+1282                  hid_m,                                  0x00, // 6D m
+1283                  hid_n,                                  0x00, // 6E n
+1284                  hid_o,                                  0x00, // 6F o
+1285                  hid_p,                                  0x00, // 70 p
+1286                  hid_q,                                  0x00, // 71 q
+1287                  hid_r,                                  0x00, // 72 r
+1288                  hid_s,                                  0x00, // 73 s
+1289                  hid_t,                                  0x00, // 74 t
+1290                  hid_u,                                  0x00, // 75 u
+1291                  hid_v,                                  0x00, // 76 v
+1292                  hid_w,                                  0x00, // 77 w
+1293                  hid_x,                                  0x00, // 78 x
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 22  
+
+1294                  hid_y,                                  0x00, // 79 y
+1295                  hid_z,                                  0x00, // 7A z
+1296                  
+1297                  hid_braces_r,                   0x20, // 7B {
+1298                  0x89,                                   0x20, // 7C |
+1299                  hid_solidus_l,                  0x20, // 7D }
+1300                  hid_equal_mark,                 0x20, // 7E ~
+1301                  hid_del,                                0x00, // 7F DEL
+1302          };
+1303          
+1304          #ifdef __KEIL_C51__
+1305          //---------------------------------------------------
+1306          //          LANGUAGE   ASCII  <-> HID   TABLE PTR
+1307          //---------------------------------------------------
+1308          code CONVERT *lang_ptr[] = 
+1309          {
+1310              lang_USA,
+1311              lang_TurkeyQ,
+1312              lang_Spain,
+1313              lang_Portugal,
+1314              lang_France,
+1315              lang_Germany,
+1316              lang_Italy,
+1317              lang_UK,
+1318              lang_Czech,
+1319              lang_Japan,
+1320          };
+1321          #else
+              void language(UINT8 type, UINT8 index, LANG *lang)
+              {
+                  switch(type)
+                  {
+                      case 0:
+                          lang->hid = lang_USA[index].hid;
+                          lang->func = lang_USA[index].func;
+                          break;
+                      case 1:
+                          lang->hid = lang_TurkeyF[index].hid;
+                          lang->func = lang_TurkeyF[index].func;
+                          break;
+                      case 2:
+                          lang->hid = lang_Spain[index].hid;
+                          lang->func = lang_Spain[index].func;
+                          break;
+                      case 3:
+                          lang->hid = lang_Portugal[index].hid;
+                          lang->func = lang_Portugal[index].func;
+                          break;
+                      case 4:
+                          lang->hid = lang_France[index].hid;
+                          lang->func = lang_France[index].func;
+                          break;
+                      case 5:
+                          lang->hid = lang_Germany[index].hid;
+                          lang->func = lang_Germany[index].func;
+                          break;
+                      case 6:
+                          lang->hid = lang_Italy[index].hid;
+                          lang->func = lang_Italy[index].func;
+                          break;
+                      case 7:
+                          lang->hid = lang_UK[index].hid;
+C51 COMPILER V9.01   ASCII2HID                                                             11/05/2018 10:27:15 PAGE 23  
+
+                          lang->func = lang_UK[index].func;
+                      case 8:
+                          lang->hid = lang_Czech[index].hid;
+                          lang->func = lang_Czech[index].func;
+                      case 9:
+                          lang->hid = lang_Japan[index].hid;
+                          lang->func = lang_Japan[index].func;
+                          break;
+                  }
+              }
+              #endif /* __KEIL_C51__ */
+1367          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   2338    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

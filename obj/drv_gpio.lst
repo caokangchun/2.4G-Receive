@@ -1,0 +1,180 @@
+C51 COMPILER V9.01   DRV_GPIO                                                              11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_GPIO
+OBJECT MODULE PLACED IN .\obj\drv_gpio.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_gpio.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\cod
+                    -e\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_gpio.l
+                    -st) OBJECT(.\obj\drv_gpio.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          //------------------------------------------------------------------------
+   5          //      Description     :       beep_ctrl
+   6          //      Parameters      :       cnt - beep times
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2014 - 12 - 05
+  10          //------------------------------------------------------------------------
+  11          void beep_ctrl(UINT8 cnt, UINT16 period)
+  12          {
+  13   1              UINT8 i;
+  14   1              
+  15   1      #ifndef DC_BUZZER
+                      UINT16 t, tmp;
+              
+                      t = period;
+                      t = (t * 13) / 5; // x factor=2.6
+              #endif /* DC_BUZZER */
+  21   1      
+  22   1              _sfrb_bank0();
+  23   1              
+  24   1              for(i = 0; i < cnt; i++)
+  25   1              {
+  26   2          #ifdef DC_BUZZER
+  27   2                      PCINT1 = ON;
+  28   2                      delay_1ms(period);
+  29   2              PCINT1 = OFF;
+  30   2          #else
+                      tmp = t;
+                              while(tmp--)
+                              {
+                                  PCINT1 = ON;
+                                  delay_1us(153);
+                          PCINT1 = OFF;
+                                  delay_1us(224);
+                                  watchdog_feed();
+                              }
+                  #endif /* DC_BUZZER */
+  41   2      
+  42   2                      if(cnt != 1)
+  43   2                      delay_1ms(period);
+  44   2                      watchdog_feed();
+  45   2              }
+  46   1      }
+  47          
+  48          volatile BOOL beep_flag = 0;
+  49          UINT8 beep_time = 0;
+  50          
+  51          //------------------------------------------------------------------------
+  52          //      Description     :       beep_ctrl
+  53          //      Parameters      :       cnt - beep times
+C51 COMPILER V9.01   DRV_GPIO                                                              11/05/2018 10:27:16 PAGE 2   
+
+  54          //      Return          :       None
+  55          //      Author          :       RAY
+  56          //      Date            :       2014 - 12 - 05
+  57          //------------------------------------------------------------------------
+  58          void beep_wait_over(void)
+  59          {
+  60   1              if(beep_flag) // Wait Decode Buz Over
+  61   1              {
+  62   2                      while(beep_flag)
+  63   2                      Watchdog_feed();
+  64   2              }
+  65   1      }
+  66          
+  67          //------------------------------------------------------------------------
+  68          //      Description     :       beep_ctrl
+  69          //      Parameters      :       cnt - beep times
+  70          //      Return          :       None
+  71          //      Author          :       RAY
+  72          //      Date            :       2014 - 12 - 05
+  73          //------------------------------------------------------------------------
+  74          void beep_task(void)
+  75          {
+  76   1              static UINT8 beep_t = 0;
+  77   1              
+  78   1              if(beep_flag)
+  79   1              {
+  80   2                      beep_t++;
+  81   2                      if(beep_t > beep_time)
+  82   2                      {
+  83   3                              beep_flag = 0;
+  84   3                              beep_t = 0;
+  85   3                              
+  86   3                  _sfrb_bank0();
+  87   3                  PCINT1 = OFF;
+  88   3                      }
+  89   2              }
+  90   1      }
+  91          
+  92          //------------------------------------------------------------------------
+  93          //      Description     :       beep_ctrl
+  94          //      Parameters      :       cnt - beep times
+  95          //      Return          :       None
+  96          //      Author          :       RAY
+  97          //      Date            :       2014 - 12 - 05
+  98          //------------------------------------------------------------------------
+  99          void beep_enable(UINT8 time)
+ 100          {
+ 101   1              beep_flag = 1;
+ 102   1              beep_time = time;
+ 103   1              
+ 104   1          _sfrb_bank0();
+ 105   1          PCINT1 = ON;
+ 106   1      }
+ 107          
+ 108          //------------------------------------------------------------------------
+ 109          //      Description     :       io init
+ 110          //      Parameters      :       None
+ 111          //      Return          :       None
+ 112          //      Author          :       Sycreader
+ 113          //      Date            :       2016 - 05 - 31
+ 114          //------------------------------------------------------------------------
+ 115          void io_init(void)
+C51 COMPILER V9.01   DRV_GPIO                                                              11/05/2018 10:27:16 PAGE 3   
+
+ 116          {    
+ 117   1          // PORT0~PORT3 configuration ---------------------
+ 118   1          _sfrb_bank0();
+ 119   1      
+ 120   1              // All IO pullup
+ 121   1              P0PU = 0xFF;
+ 122   1              P1PU = 0xFF;
+ 123   1              P2PU = 0xFF;
+ 124   1              P3PU = 0xFF;
+ 125   1              
+ 126   1              //P0OE |= BIT_MASK(0); // LED
+ 127   1              //P2IE |= BIT_MASK(2); // IRQ
+ 128   1      
+ 129   1              P3OE |= BIT_MASK(4); // SPI_CS
+ 130   1              P34 = 1;
+ 131   1              
+ 132   1              P3OE |= BIT_MASK(5); // SPI_CLK
+ 133   1              P35 = 0;
+ 134   1              
+ 135   1          // PORT4 configuration ----------------------------
+ 136   1          _sfrb_bank1();
+ 137   1      
+ 138   1              // All IO pullup
+ 139   1              P4PU = 0x3F;
+ 140   1      
+ 141   1              // UART IO config
+ 142   1              P4OE |= BIT_MASK(0);
+ 143   1              P4IE |= BIT_MASK(1);
+ 144   1              
+ 145   1              P4IE |= BIT_MASK(3); // IRQ
+ 146   1      
+ 147   1              // SPI IO config
+ 148   1              P4OE |= BIT_MASK(5); // SPI_MOSI
+ 149   1              P4IE |= BIT_MASK(4); // SPI_MISO
+ 150   1      }
+ 151          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    167    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      2       4
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

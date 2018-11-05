@@ -1,0 +1,583 @@
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE USB_DESCRIPT
+OBJECT MODULE PLACED IN .\obj\usb_descript.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\usb\usb_descript.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\a
+                    -pp\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\usb_descript.
+                    -lst) OBJECT(.\obj\usb_descript.obj)
+
+line level    source
+
+   1          
+   2          #include "usb_descript.h"
+   3          #include "main.h"
+   4          #include "usb.h"
+   5          
+   6          unsigned char code uKeyReportTable[] = {
+   7              0X05,0X01,      //usage page            USAGE_PAGE (Generic Desktop)
+   8              0X09,0X06,      //usage                 USAGE (Keyboard)
+   9              0XA1,0X01,      //collection            COLLECTION (Application)
+  10              0X05,0X07,      //usage page            USAGE_PAGE (Keyboard)
+  11              
+  12              0X19,0XE0,      //usage min             USAGE_MINIMUM (Keyboard LeftControl)
+  13              0X29,0XE7,      //usage max             USAGE_MAXIMUM (Keyboard Right GUI)
+  14              0X15,0X00,      //logical min           LOGICAL_MINIMUM (0)
+  15              0X25,0X01,      //logical max           LOGICAL_MAXIMUM (1)
+  16              0X75,0X01,      //report size           REPORT_SIZE (1)
+  17              0X95,0X08,      //report count          REPORT_COUNT (8)
+  18              0X81,0X02,      //input//                 INPUT (Data,Var,Abs)
+  19              
+  20              0X95,0X01,      //report count          REPORT_COUNT (1)
+  21              0X75,0X08,      //report size           REPORT_SIZE (8)
+  22              0X81,0X03,      //input                 INPUT (Cnst,Var,Abs)
+  23              
+  24              0X95,0X06,      //report count          REPORT_COUNT (6)
+  25              0X75,0X08,      //report size           REPORT_SIZE (8)
+  26              0X15,0X00,      //logical min           LOGICAL_MINIMUM (0)
+  27              0X25,0x8F,      //logical max           LOGICAL_MAXIMUM (101)
+  28              0X05,0X07,      //usage page            USAGE_PAGE (Keyboard)
+  29              0X19,0X00,      //usage min             USAGE_MINIMUM (Reserved (no event indicated))
+  30              0X29,0x8F,      //usage max             USAGE_MAXIMUM (Keyboard Application)
+  31              0X81,0X00,      //input                 INPUT (Data,Ary,Abs)
+  32          
+  33              //led
+  34              0X95,0X05,      //report count          REPORT_COUNT (5)
+  35              0X75,0X01,      //report size           REPORT_SIZE (1)
+  36              0X05,0X08,      //usage page            USAGE_PAGE (LEDs)
+  37              0X19,0X01,      //usage min             USAGE_MINIMUM (Num Lock)
+  38              0X29,0X05,      //usage max             USAGE_MAXIMUM (Kana)
+  39              0X91,0X02,      //output                OUTPUT (Data,Var,Abs)
+  40              
+  41              0X95,0X01,      //report count          REPORT_COUNT (1)
+  42              0X75,0X03,      //report size           REPORT_SIZE (3)
+  43              0X91,0X03,      //output                OUTPUT (Cnst,Var,Abs)
+  44              0xc0,           //end collection      
+  45          };
+  46          
+  47          unsigned char code uMouseReportTable[] = {
+  48              0X05,0X01,      //USAGE_PAGE (Generic Desktop)
+  49              0X09,0X02,      //USAGE (Mouse)     
+  50              0XA1,0X01,      //COLLECTION (Application)     
+  51              0X85,0X01,      //mouse id        
+  52              0X09,0X01,      //USAGE_PAGE(pointer)
+  53              0XA1,0X00,      //COLLECTION        
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 2   
+
+  54              
+  55              //key           
+  56              0X05,0X09,      //USAGE_PAGE (Button)    
+  57              0X19,0X01,      //USAGE_MINIMUM (Button 1)        
+  58              0X29,0X05,      //USAGE_MAXIMUM (Button 5)        
+  59              0X15,0X00,      //LOGICAL_MINIMUM (0)
+  60              0X25,0X01,      //LOGICAL_MAXIMUM (1)
+  61              0X95,0X05,      //REPORT_COUNT (3)
+  62              0X75,0X01,      //REPORT_SIZE (1)    
+  63              0X81,0X02,      //INPUT (Data,Var,Abs)
+  64              
+  65              //fill
+  66              0X95,0X01,      //REPORT_COUNT (1)    
+  67              0X75,0X03,      //REPORT_SIZE (5)
+  68              0X81,0X03,      //INPUT (Cnst,Var,Abs)
+  69          
+  70              //X,Y,wheel          
+  71              0X05,0X01,      //USAGE_PAGE (Generic Desktop)         
+  72              0X09,0X30,      //USAGE (X)         
+  73              0X09,0X31,      //USAGE (Y)     
+  74              0X09,0X38,      //usage  wheel    
+  75              0X15,0X80,      //LOGICAL_MINIMUM (-128)     
+  76              0X25,0X7F,      //LOGICAL_MAXIMUM (127) 
+  77              0X75,0X08,      //REPORT_SIZE (8)     
+  78              0X95,0X03,      //REPORT_COUNT (2)
+  79              0X81,0X06,      //input  
+  80              
+  81              0XC0,                  //end collection     
+  82              0XC0,                  //end collection    
+  83              
+  84              //-------------------------------------------------------------//
+  85              //consumer production                                          //
+  86              //-------------------------------------------------------------//
+  87              
+  88              0X05,0X0C,      //usage page     consumer device    
+  89              0X09,0X01,      //usage          consumer control       
+  90                              
+  91              0XA1,0X01,      //collection     application    
+  92              0X85,0X02,      //report id      (2)
+  93                              
+  94              0X15,0X00,      //logical min       
+  95              0X25,0X01,      //logical max 
+  96              0X05,0X0C,      //usage page     consumer device 
+  97              
+  98              //BYTE ONE
+  99              0X09,0Xb5,      //usage          scan next track
+ 100              0X09,0XB6,      //usage          scan previous track
+ 101              0X09,0XB7,      //usage          stop
+ 102              0X09,0XCD,      //usage          play / pause
+ 103              0X09,0Xb3,      //usage          fast forward
+ 104              0X09,0Xb4,      //usage          rewind
+ 105              0X09,0XB8,      //usage          eject
+ 106              0X09,0Xb9,      //usage          radom play
+ 107              0X75,0X01,      //report size       
+ 108              0X95,0X08,      //report count          
+ 109              0X81,0X02,      //input//  
+ 110              
+ 111              //BYTE TWO
+ 112              0X09,0Xe2,      //usage          mute
+ 113              0X09,0Xe9,      //usage          volume up
+ 114              0X09,0Xea,      //usage          volume down
+ 115              0X09,0Xb2,      //usage          record
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 3   
+
+ 116              0X0A,0X2A,0X02, //usage          www bookmarks
+ 117              0X0A,0X2b,0X02, //usage          www history
+ 118              0X0A,0X83,0X01, //usage          Consumer Control Configuration (music)
+ 119              0X0A,0X92,0X01, //usage          calculator
+ 120              0X75,0X01,      //report size       
+ 121              0X95,0X08,      //report count          
+ 122              0X81,0X02,      //input  
+ 123              
+ 124              //BYTE THREE
+ 125              0X0A,0X23,0X02, //usage          www home page
+ 126              0X0A,0X24,0X02, //usage          www go back
+ 127              0X0A,0X25,0X02, //usage          www go forward
+ 128              0X0A,0X26,0X02, //usage          www stop
+ 129              0X0A,0X27,0X02, //usage          www fresh
+ 130              0X0A,0X8a,0X01, //usage          mail reader
+ 131              0X0A,0X96,0X01, //usage          internet browser
+ 132              0X0A,0X94,0X01, //usage          local machine browser
+ 133              0X75,0X01,      //report size       
+ 134              0X95,0X08,      //report count          
+ 135              0X81,0X02,      //input//  
+ 136              
+ 137              0X05,0X01,      //usage page     USAGE_PAGE (Generic Desktop)
+ 138              0X15,0X00,      //logical min    LOGICAL_MINIMUM (0)
+ 139              0X25,0X01,      //logical max    LOGICAL_MAXIMUM (1)
+ 140              
+ 141              //BYTE four
+ 142              0X09,0X81,      //usage          system power down
+ 143              0X09,0X82,      //usage          system sleep
+ 144              0X09,0X83,      //usage          system wake up
+ 145              
+ 146              0X95,0X03,      //report count   REPORT_COUNT (3)
+ 147              0X75,0X01,      //report size    REPORT_SIZE (1)
+ 148              0X81,0X06,      //input          INPUT (Data,Var,Rel
+ 149              
+ 150              0X95,0X01,      //REPORT_COUNT   (1)    
+ 151              0X75,0X05,      //REPORT_SIZE    (5)
+ 152              0X81,0X03,      //INPUT (Data,Var,Rel )
+ 153              
+ 154              0XC0,           //end collection 
+ 155          
+ 156          };
+ 157          
+ 158          unsigned char code uHidReportTable[] = {
+ 159              0x06, 0xA0, 0xff,              // USAGE_PAGE (Vendor Defined Page 1)
+ 160              0x09, 0x01,                    // USAGE (Vendor Usage 1)
+ 161              0xa1, 0x01,                    // COLLECTION (Application)
+ 162                  0x85, 0x01,                    //   REPORT_ID (1)
+ 163                  0x09, 0x08,                    //   USAGE (Vendor Usage 3)
+ 164                  0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
+ 165                  0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+ 166                  0x75, 0x08,                    //   REPORT_SIZE (8)
+ 167                  0x95, 0xff,                    //   REPORT_COUNT (255)
+ 168                  0xb1, 0x02,                    //   FEATURE (Data,Ary,Abs,Wrap)
+ 169                  
+ 170                  0x85, 0x02,                    //   REPORT_ID (2)
+ 171                  0x09, 0x08,                    //   USAGE (Vendor Usage 3)
+ 172                  0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
+ 173                  0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+ 174                  0x75, 0x08,                    //   REPORT_SIZE (8)
+ 175                  0x95, 0xff,                    //   REPORT_COUNT (255)
+ 176                  0xb1, 0x02,                    //   FEATURE (Data,Ary,Abs,Wrap)
+ 177          
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 4   
+
+ 178                  0x85, 0x03,                    //   REPORT_ID (3)
+ 179                  0x09, 0x08,                    //   USAGE (Vendor Usage 3)
+ 180                  0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
+ 181                  0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+ 182                  0x75, 0x08,                    //   REPORT_SIZE (8)
+ 183                  0x95, 0xff,                    //   REPORT_COUNT (255)
+ 184                  0xb1, 0x02,                    //   FEATURE (Data,Ary,Abs,Wrap)
+ 185              0xc0,                          //   END_COLLECTION
+ 186          };
+ 187          
+ 188          unsigned char code uLanguageTab[] = { 0x04,0x03,0x09,0x04 };
+ 189          unsigned char code uMftTab[] = {
+ 190              32,         //该描述符的长度为32字节
+ 191              0x03,       //字符串描述符的类型编码为0x03
+ 192              0x42, 0x00, //B
+ 193              0x41, 0x00, //A
+ 194              0x52, 0x00, //R
+ 195              0x43, 0x00, //C
+ 196              0x4f, 0x00, //O
+ 197              0x44, 0x00, //D
+ 198              0x45, 0x00, //E
+ 199              0x20, 0x00, // 
+ 200              0x53, 0x00, //S
+ 201              0x43, 0x00, //C
+ 202              0x41, 0x00, //A
+ 203              0x4e, 0x00, //N
+ 204              0x4e, 0x00, //N
+ 205              0x45, 0x00, //E
+ 206              0x52, 0x00, //R
+ 207              //注：请将最后一个多余的逗号删除
+ 208           };
+ 209          
+ 210          
+ 211          unsigned char code uProductTab[] = {
+ 212              32,         //该描述符的长度为32字节
+ 213              0x03,       //字符串描述符的类型编码为0x03
+ 214              0x42, 0x00, //B
+ 215              0x41, 0x00, //A
+ 216              0x52, 0x00, //R
+ 217              0x43, 0x00, //C
+ 218              0x4f, 0x00, //O
+ 219              0x44, 0x00, //D
+ 220              0x45, 0x00, //E
+ 221              0x20, 0x00, // 
+ 222              0x53, 0x00, //S
+ 223              0x43, 0x00, //C
+ 224              0x41, 0x00, //A
+ 225              0x4e, 0x00, //N
+ 226              0x4e, 0x00, //N
+ 227              0x45, 0x00, //E
+ 228              0x52, 0x00, //R
+ 229              //注：请将最后一个多余的逗号删除
+ 230          };
+ 231          
+ 232          
+ 233          unsigned char code uInterfaceTab0[] = {
+ 234              26,         //该描述符的长度为26字节
+ 235              0x03,       //字符串描述符的类型编码为0x03
+ 236              0x55, 0x00, //U
+ 237              0x53, 0x00, //S
+ 238              0x42, 0x00, //B
+ 239              0x20, 0x00, // 
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 5   
+
+ 240              0x4b, 0x00, //K
+ 241              0x65, 0x00, //e
+ 242              0x79, 0x00, //y
+ 243              0x62, 0x00, //b
+ 244              0x6f, 0x00, //o
+ 245              0x61, 0x00, //a
+ 246              0x72, 0x00, //r
+ 247              0x64, 0x00, //d
+ 248              //注：请将最后一个多余的逗号删除
+ 249          };
+ 250          
+ 251          
+ 252          unsigned char code uInterfaceTab1[] = {
+ 253              30,         //该描述符的长度为30字节
+ 254              0x03,       //字符串描述符的类型编码为0x03
+ 255              0x55, 0x00, //U
+ 256              0x53, 0x00, //S
+ 257              0x42, 0x00, //B
+ 258              0x20, 0x00, // 
+ 259              0x56, 0x00, //V
+ 260              0x45, 0x00, //E
+ 261              0x4e, 0x00, //N
+ 262              0x44, 0x00, //D
+ 263              0x45, 0x00, //E
+ 264              0x52, 0x00, //R
+ 265              0x20, 0x00, // 
+ 266              0x48, 0x00, //H
+ 267              0x49, 0x00, //I
+ 268              0x44, 0x00, //D
+ 269              //注：请将最后一个多余的逗号删除
+ 270          };
+ 271          
+ 272          
+ 273          unsigned char code uSerialNoTab[] = {
+ 274              26,         //该描述符的长度为26字节
+ 275              0x03,       //字符串描述符的类型编码为0x03
+ 276              0x53, 0x00, //S
+ 277              0x4e, 0x00, //N
+ 278              0x32, 0x00, //2
+ 279              0x30, 0x00, //0
+ 280              0x31, 0x00, //1
+ 281              0x37, 0x00, //7
+ 282              0x30, 0x00, //0
+ 283              0x36, 0x00, //6
+ 284              0x56, 0x00, //V
+ 285              0x45, 0x00, //E
+ 286              0x52, 0x00, //R
+ 287              0x31, 0x00, //1
+ 288              //注：请将最后一个多余的逗号删除
+ 289          };
+ 290          
+ 291          
+ 292          unsigned char  code uDevHidTable[] = {
+ 293          0x12,                           //uint8 b_length
+ 294          0x01,                           //uint8 b_descriptor_type
+ 295          0x10,                           //uint8 bcd_usb_l
+ 296          0x01,                           //uint8 bcd_usb_h
+ 297          0x00,                           //uint8 b_device_class
+ 298          0x00,                           //uint8 b_device_sub_class
+ 299          0x00,                           //uint8 b_device_protocol
+ 300          _MAX_EP_SIZE_,                  //uint8 b_max_packe_size0
+ 301          0xFF,                           //uint8 id_vender_l
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 6   
+
+ 302          0xFF,                           //uint8 id_vender_h
+ 303          0x35,                           //uint8 id_product_l
+ 304          0x00,                           //uint8 id_product_h
+ 305          0x01,                           //uint8 bcd_device_l
+ 306          0x00,                           //uint8 bcd_device_h
+ 307          #if _DEV_STR_DES_EN
+ 308          0x01,                           //uint8 i_manufacturer
+ 309          0x02,                           //uint8 i_product
+ 310          0x03,                           //uint8 i_serial_number
+ 311          #else
+              0x00,                           //uint8 i_manufacturer
+              0x00,                           //uint8 i_product
+              0x00,                           //uint8 i_serial_number
+              #endif
+ 316          0x01,                           //uint8 b_num_configuration
+ 317          };
+ 318          
+ 319          unsigned char code uDevHidCfgTable[] = {
+ 320          //Configuration 9-byte
+ 321          0x09,                                          //0--bLength
+ 322          0x02,                                          //1--bDescriptorType
+ 323          ( 9 + (9 + 9 + 7 ) + ( 9 + 9 )*1 ),            //2--wTotalLength l
+ 324          0X00,                                          //3--wTotalLength h
+ 325          0x02,                                          //4--bNumInterFace
+ 326          0x01,                                          //5--bConfigurationValue
+ 327          0x00,                                          //6--iConfigration
+ 328          0xA0,                                          //7--bmAtrributes
+ 329          0x64,                                          //8--bMaxPower Imax =2*bMaxPower
+ 330          
+ 331          //-------------------------------------------------------------//
+ 332          //Interface 0 9-byte for keyboard,(ep1)                        //
+ 333          //-------------------------------------------------------------//
+ 334          0x09,                                          //0--bLengh
+ 335          0x04,                                          //1--bdescriptortpye
+ 336          0x00,                                          //2--binterfacenumber
+ 337          0x00,                                          //3--balternatsetting
+ 338          0x01,                                          //4--bnumendpoints
+ 339          0x03,                                          //5--binterfaceclass
+ 340          0x01,                                          //6--binterfacesubclass
+ 341          0x01,                                          //7--binterfaceprotocol 01=KB// 02=M
+ 342          #if _DEV_STR_DES_EN
+ 343          0x04,                                          //8--iconfiguration
+ 344          #else
+              0x00,                                          //8--iconfiguration
+              #endif
+ 347          
+ 348          //-------------------------------------------------------------//
+ 349          //HID 0 9-byte                                                 //
+ 350          //-------------------------------------------------------------//
+ 351          //USB_HID_KEYBOARD_TABLE:
+ 352          0x09,                                          //0--blength
+ 353          0x21,                                          //1--bdescriptortype
+ 354          0x10,                                          //2--bbcdhidl
+ 355          0x01,                                          //3--bcdhid
+ 356          0x00,                                          //4--bcountycode
+ 357          0x01,                                          //5--bnumdescriptors
+ 358          0x22,                                          //6--bdescriptortype
+ 359          _KEY_REPORT_TAB_SIZE_ & 0xFF,                  //7--bdescriptor length, low byte
+ 360          ( _KEY_REPORT_TAB_SIZE_ >>8 ) & 0xFF,          //8--bdescriptor length, high byte
+ 361          
+ 362          //-------------------------------------------------------------//
+ 363          //EP1 7-byte  for HID0 (keyboard)                              //
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 7   
+
+ 364          //-------------------------------------------------------------//
+ 365          0x07,                                          //0--blength
+ 366          0x05,                                          //1--bdescriptortype
+ 367          0x81,                                          //2--bendpointaddress
+ 368          0x03,                                          //3--bmattributes
+ 369          _MAX_EP_SIZE_/*0x08*/,                         //4--bwmaxpacketlsize
+ 370          0x00,                                          //5--bwmaxpacketh
+ 371          0x01,                                          //6--Query interval(ms)
+ 372          
+ 373          #ifdef _USB_HID
+ 374          //-------------------------------------------------------------//
+ 375          //Interface 1 9-byte for HID_VENDER                                 //
+ 376          //-------------------------------------------------------------//
+ 377          0x09,                                          //0--bLengh
+ 378          0x04,                                          //1--bdescriptortpye
+ 379          0x01,                                          //2--binterfacenumber
+ 380          0x00,                                          //3--balternatsetting
+ 381          0x00,                                          //4--bnumendpoints
+ 382          0x03,                                          //5--binterfaceclass
+ 383          0x00,                                          //6--binterfacesubclass
+ 384          0x00,                                          //7--binterfaceprotocol 01=KB// 02=M
+ 385          #if _DEV_STR_DES_EN
+ 386          0x05,                                          //8--iconfiguration
+ 387          #else
+              0x00,                                          //8--iconfiguration
+              #endif
+ 390          
+ 391          //-------------------------------------------------------------//
+ 392          //HID 1 9-byte                                                 //
+ 393          //-------------------------------------------------------------//
+ 394          //USB_HID_TABLE:
+ 395          0x09,                                          //0--blength
+ 396          0x21,                                          //1--bdescriptortype
+ 397          0x10,                                          //2--bbcdhidl
+ 398          0x01,                                          //3--bcdhid
+ 399          0x00,                                          //4--bcountycode
+ 400          0x01,                                          //5--bnumdescriptors
+ 401          0x22,                                          //6--bdescriptortype
+ 402          _HID_REPORT_TAB_SIZE_ & 0xFF,                  //7--bdescriptor length low byte 
+ 403          ( _HID_REPORT_TAB_SIZE_ >>8) & 0xFF,           //8--bdescriptor length high byte
+ 404          #endif /* _USB_HID */
+ 405          };
+ 406          
+ 407          #ifdef _USB_VCOM
+ 408          unsigned char  code uDevCdcTable[] = {
+ 409          0x12,                           //uint8 b_length
+ 410          0x01,                           //uint8 b_descriptor_type
+ 411          0x10,                           //uint8 bcd_usb_l
+ 412          0x01,                           //uint8 bcd_usb_h
+ 413          0x02,                           //uint8 b_device_class
+ 414          0x00,                           //uint8 b_device_sub_class
+ 415          0x00,                           //uint8 b_device_protocol
+ 416          _MAX_EP_SIZE_,                  //uint8 b_max_packe_size0
+ 417          0x4A,                           //uint8 id_vender_l
+ 418          0x29,                           //uint8 id_vender_h
+ 419          0x00,                           //uint8 id_product_l
+ 420          0x01,                           //uint8 id_product_h
+ 421          0x01,                           //uint8 bcd_device_l
+ 422          0x00,                           //uint8 bcd_device_h
+ 423          #if _DEV_STR_DES_EN
+ 424          0x01,                           //uint8 i_manufacturer
+ 425          0x02,                           //uint8 i_product
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 8   
+
+ 426          0x03,                           //uint8 i_serial_number
+ 427          #else
+              0x00,                           //uint8 i_manufacturer
+              0x00,                           //uint8 i_product
+              0x00,                           //uint8 i_serial_number
+              #endif
+ 432          0x01,                           //uint8 b_num_configuration
+ 433          };
+ 434          
+ 435          unsigned char code uDevCdcCfgTable[] = {
+ 436          //Configuration 9-byte
+ 437          0x09,                                          //0--bLength
+ 438          0x02,                                          //1--bDescriptorType
+ 439          ( 9 + ( 9 + 19 + 7 ) + ( 9 + 7 + 7 ) ),        //2--wTotalLength l
+ 440          0X00,                                          //3--wTotalLength h
+ 441          0x02,                                          //4--bNumInterFace
+ 442          0x01,                                          //5--bConfigurationValue
+ 443          0x00,                                          //6--iConfigration
+ 444          0xA0,                                          //7--bmAtrributes
+ 445          0x64,                                          //8--bMaxPower Imax =2*bMaxPower
+ 446          
+ 447          /* CIC INTERFACE DESCRIPTOR */
+ 448          0x09,
+ 449          0x04,
+ 450          0,                          /* bInterfaceNumber */
+ 451          0x00,                       /* bAlternateSetting */
+ 452          0x01,                       /* management and notification(optional)element present */
+ 453          0x02,                       /* Communication Interface Class */
+ 454          0x02,
+ 455          0x01,
+ 456          0x00,                       /* Interface Description String Index*/
+ 457          
+ 458          /* CDC Class-Specific descriptor */
+ 459          0x05,                       /* size of Functional Desc in bytes */
+ 460          0x24,                       /* descriptor type*/
+ 461          0x00,
+ 462          0x10,
+ 463          0x01,                       /* USB Class Definitions for CDC spec release number in BCD */
+ 464          
+ 465          0x05,                       /* Size of this descriptor */
+ 466          0x24,                       /* descriptor type*/
+ 467          0x01,
+ 468          0x01,/*may use 0x03 */      /* device handales call management itself(D0 set)
+ 469                                      and will process commands multiplexed over the data interface */
+ 470          0x01,                       /* Indicates multiplexed commands are
+ 471                                      handled via data interface */
+ 472          
+ 473          0x04,                       /* Size of this descriptor */
+ 474          0x24,                       /* descriptor type*/
+ 475          0x02,
+ 476          0x02, /*may use 0x0F */     /* Device Supports all commands for ACM - CDC
+ 477                                      PSTN SubClass bmCapabilities */
+ 478          
+ 479          0x05,                       /* size of Functional Desc in bytes */
+ 480          0x24,                       /* descriptor type*/
+ 481          0x06,
+ 482          0x00,                       /* Interface Number of Control */
+ 483          0x01,                       /* Interface Number of Subordinate (Data Class) Interface */
+ 484          
+ 485          /*Endpoint descriptor */
+ 486          0x07,
+ 487          0x05,
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 9   
+
+ 488          0x81,
+ 489          0x03,
+ 490          _MAX_EP_SIZE_,
+ 491          0x00,
+ 492          0x0A,
+ 493          
+ 494          /* DATA CLASS INTERFACE DESCRIPTOR */
+ 495          0x09,
+ 496          0x04,
+ 497          1,                          /* bInterfaceNumber */
+ 498          0x00,                       /* bAlternateSetting */
+ 499          0x02,                       /* notification element included */
+ 500          0x0A,                       /* DATA Interface Class */
+ 501          0x00,                       /* Data Interface SubClass Code */
+ 502          0x00,
+ 503          0x00,                       /* Interface Description String Index*/
+ 504          
+ 505          /*Endpoint descriptor */
+ 506          0x07,
+ 507          0x05,
+ 508          0x82,
+ 509          0x02,
+ 510          _MAX_EP_SIZE_,
+ 511          0x00,
+ 512          0x00,                       /* This value is ignored for Bulk ENDPOINT */
+ 513          
+ 514          /*Endpoint descriptor */
+ 515          0x07,
+ 516          0x05,
+ 517          0x03,
+ 518          0x02,
+ 519          _MAX_EP_SIZE_,
+ 520          0x00,
+ 521          0x00                        /* This value is ignored for Bulk ENDPOINT */
+ 522          };
+ 523          #endif /* _USB_VCOM */
+ 524          
+ 525          unsigned char* GetHid0Des()
+ 526          {
+ 527   1          unsigned char* lpszBuf = uDevHidCfgTable;
+ 528   1          lpszBuf += 18;
+ 529   1          return lpszBuf;
+ 530   1      }
+ 531          
+ 532          unsigned char* GetHid1Des()
+ 533          {
+ 534   1          unsigned char* lpszBuf = uDevHidCfgTable;
+ 535   1          lpszBuf += 43;
+ 536   1          return lpszBuf;
+ 537   1      }
+ 538          
+ 539          
+ 540          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     28    ----
+   CONSTANT SIZE    =    592    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.01   USB_DESCRIPT                                                          11/05/2018 10:27:16 PAGE 10  
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

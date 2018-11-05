@@ -1,0 +1,4 @@
+---- data_xor_check Matches (3 in 3 files) ----
+Checkout.c (system\src):BOOL data_xor_check(const UINT8 *src, UINT8 len, UINT8 xor)
+Checkout.h (system\inc):BOOL data_xor_check(const UINT8 *src, UINT8 len, UINT8 xor);
+Uart2usb.c (app\src):            if(data_xor_check(&data_buff[HEAD_LEN], data_buff[0] - HEAD_LEN - 1, xor_val))

@@ -1,0 +1,27 @@
+".\obj\main.obj",
+".\obj\uart2usb.obj",
+".\obj\usb_app.obj",
+".\obj\rf.obj",
+".\obj\interrupt.obj",
+".\obj\ascii2hid.obj",
+".\code\XN297L.LIB",
+".\obj\STARTUP.obj",
+".\code\USB.LIB",
+".\obj\usb_descript.obj",
+".\obj\drv_clock.obj",
+".\obj\drv_gpio.obj",
+".\obj\drv_timer.obj",
+".\obj\drv_uart.obj",
+".\obj\drv_serial.obj",
+".\obj\drv_flash.obj",
+".\obj\drv_watchdog.obj",
+".\obj\drv_spi_simulate.obj",
+".\obj\delay.obj",
+".\obj\initial.obj",
+".\obj\checkout.obj",
+".\obj\it_config.obj" 
+TO ".\obj\CV8F5025_XN297L" 
+PRINT(".\obj\CV8F5025_XN297L.m51") RAMSIZE(256) 
+DISABLEWARNING (15,16) 
+CODE( 0X1800-0x7FFF )
+XDATA( 0X8000-0X8FFF )

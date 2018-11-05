@@ -1,0 +1,1 @@
+"code\app\src\STARTUP.A51" SET (LARGE) DEBUG PRINT(.\obj\STARTUP.lst) OBJECT(.\obj\STARTUP.obj) EP

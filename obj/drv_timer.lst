@@ -1,0 +1,92 @@
+C51 COMPILER V9.01   DRV_TIMER                                                             11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_TIMER
+OBJECT MODULE PLACED IN .\obj\drv_timer.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_timer.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\co
+                    -de\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_timer
+                    -.lst) OBJECT(.\obj\drv_timer.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          //------------------------------------------------------------------------
+   5          //      Description     :       timer0 config
+   6          //      Parameters      :       period -> timer for x us
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2016 - 05 - 31
+  10          //------------------------------------------------------------------------
+  11          void timer0_init(UINT16 period)
+  12          {
+  13   1              UINT16 temp16;
+  14   1              
+  15   1              /* Select bank1 before set TIMER1 register */
+  16   1              _sfrb_bank1();
+  17   1              
+  18   1              /* set T0 period */
+  19   1              temp16 = (period * STEPS_PER_US) - 1;
+  20   1              T0PR1 = temp16 / 256;
+  21   1              T0PR0 = temp16 % 256;
+  22   1      
+  23   1              /* T0 control */
+  24   1              T0CON = (0 << 7) | // TOV flag
+  25   1                              (0 << 4) | // Clock divide
+  26   1                              (0 << 2) | // 0: sys clock, 1: rising edge. 2: falling edge 3: rising edge and falling edge
+  27   1                              (0 << 1) | // Reserved
+  28   1                              (1 << 0);  // TE Enable TIMER0
+  29   1      
+  30   1              /* clear T0 counter */
+  31   1              T0CNT0 = 0;
+  32   1              T0CNT1 = 0;
+  33   1      }
+  34          
+  35          //------------------------------------------------------------------------
+  36          //      Description     :       timer1 config
+  37          //      Parameters      :       period -> timer for x us
+  38          //      Return          :       None
+  39          //      Author          :       Sycreader
+  40          //      Date            :       2016 - 05 - 31
+  41          //------------------------------------------------------------------------
+  42          void timer1_init(UINT16 period)
+  43          {
+  44   1              UINT16 temp16;
+  45   1      
+  46   1              /* Select bank1 before set TIMER1 register */
+  47   1              _sfrb_bank1();
+  48   1      
+  49   1              /* set T1 period */
+  50   1              temp16 = (period * STEPS_PER_US) - 1;
+  51   1              T1PR1 = temp16 / 256;
+  52   1              T1PR0 = temp16 % 256;
+  53   1      
+C51 COMPILER V9.01   DRV_TIMER                                                             11/05/2018 10:27:16 PAGE 2   
+
+  54   1              /* T1 control */
+  55   1              T1CON = (0 << 7) | // TOV flag
+  56   1                              (0 << 4) | // Clock divide
+  57   1                              (0 << 2) | // 0: sys clock, 1: rising edge. 2: falling edge 3: rising edge and falling edge
+  58   1                              (0 << 1) | // Reserved
+  59   1                              (1 << 0);  // TE Enable TIMER0
+  60   1      
+  61   1              /* clear T1 counter */
+  62   1              T1CNT0 = 0;
+  63   1              T1CNT1 = 0;
+  64   1      }
+  65          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     58    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

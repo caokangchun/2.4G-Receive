@@ -1,0 +1,181 @@
+C51 COMPILER V9.01   DRV_FLASH                                                             11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_FLASH
+OBJECT MODULE PLACED IN .\obj\drv_flash.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_flash.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\co
+                    -de\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_flash
+                    -.lst) OBJECT(.\obj\drv_flash.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          //------------------------------------------------------------------------
+   5          //      Description     :       system clock config
+   6          //      Parameters      :       None
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2016 - 05 - 31
+  10          //------------------------------------------------------------------------
+  11          void Flash_PageErase( uint16 uAddr16 )
+  12          {
+  13   1          BYTE ii = (BYTE)( uAddr16 >> 8 );
+  14   1          ii &= ~0x01;
+  15   1      
+  16   1          SFRB = 1;
+  17   1      
+  18   1          EFADR1 = (BYTE)ii;
+  19   1          EFADR0 = 0x00;
+  20   1      
+  21   1          EFCON = 0x77;       /* key 1 */
+  22   1          EFCON = 0x3B;       /* key 2 */
+  23   1      
+  24   1          while( !( EFCON & 0x80) )
+  25   1          {
+  26   2          }
+  27   1      
+  28   1          EFCON &= ~0x80;
+  29   1      }
+  30          
+  31          //------------------------------------------------------------------------
+  32          //      Description     :       system clock config
+  33          //      Parameters      :       None
+  34          //      Return          :       None
+  35          //      Author          :       Sycreader
+  36          //      Date            :       2016 - 05 - 31
+  37          //------------------------------------------------------------------------
+  38          void Flash_Read( uint16 uAddr16, BYTE* pBuf, uint16 ulen )
+  39          
+  40          {
+  41   1          uint16 ii;
+  42   1          BYTE code* pData;
+  43   1      
+  44   1          pData = (BYTE code* )uAddr16;
+  45   1      
+  46   1          for(ii = 0; ii < ulen; ii++)
+  47   1          {
+  48   2              *pBuf = *pData;
+  49   2              pBuf++;
+  50   2              pData++;
+  51   2          }
+  52   1      }
+  53          
+C51 COMPILER V9.01   DRV_FLASH                                                             11/05/2018 10:27:16 PAGE 2   
+
+  54          //------------------------------------------------------------------------
+  55          //      Description     :       system clock config
+  56          //      Parameters      :       None
+  57          //      Return          :       None
+  58          //      Author          :       Sycreader
+  59          //      Date            :       2016 - 05 - 31
+  60          //------------------------------------------------------------------------
+  61          void Flash_PageWrite( uint16 uAddr16, BYTE* pBuf, uint16 ulen )
+  62          {
+  63   1          uint16 ii;
+  64   1          uAddr16 &= 0xFE00;
+  65   1      
+  66   1          SFRB = 1;
+  67   1          for( ii = 0; ii < 512; ii ++, uAddr16 ++ )
+  68   1          {
+  69   2              EFADR1 = (BYTE)(uAddr16 >> 8 );
+  70   2              EFADR0 = (BYTE)uAddr16;
+  71   2              if(ii < ulen)
+  72   2              {
+  73   3                  EFBUF = *pBuf ++ ;
+  74   3              }
+  75   2              else
+  76   2              {
+  77   3                  EFBUF = 0xFF;
+  78   3              }
+  79   2              EFCON = 0x5D;       /* key 1 */
+  80   2              EFCON = 0x74;       /* key 2 */
+  81   2          
+  82   2              while( !( EFCON & 0x80) )
+  83   2              {
+  84   3              }
+  85   2          
+  86   2              EFCON &= ~0x80; 
+  87   2          }
+  88   1      }
+  89          
+  90          //------------------------------------------------------------------------
+  91          //      Description     :       system clock config
+  92          //      Parameters      :       None
+  93          //      Return          :       None
+  94          //      Author          :       Sycreader
+  95          //      Date            :       2016 - 05 - 31
+  96          //------------------------------------------------------------------------
+  97          void Flash_Write( uint16 uAddr16, BYTE* pBuf, uint16 ulen )
+  98          {
+  99   1          uint16 ii;
+ 100   1      
+ 101   1          SFRB = 1;
+ 102   1          for( ii = 0; ii < ulen; ii ++, uAddr16 ++ )
+ 103   1          {
+ 104   2              EFADR1 = (BYTE)(uAddr16 >> 8 );
+ 105   2              EFADR0 = (BYTE)uAddr16;
+ 106   2              
+ 107   2              EFBUF = *pBuf;
+ 108   2              
+ 109   2              EFCON = 0x5D;       /* key 1 */
+ 110   2              EFCON = 0x74;       /* key 2 */
+ 111   2          
+ 112   2              while( !( EFCON & 0x80) )
+ 113   2              {
+ 114   3              }
+ 115   2          
+C51 COMPILER V9.01   DRV_FLASH                                                             11/05/2018 10:27:16 PAGE 3   
+
+ 116   2              EFCON &= ~0x80;
+ 117   2      
+ 118   2              /* flash need write twice ? */
+ 119   2              EFADR1 = (BYTE)(uAddr16 >> 8 );
+ 120   2              EFADR0 = (BYTE)uAddr16;
+ 121   2              
+ 122   2              EFBUF = *pBuf;
+ 123   2              
+ 124   2              EFCON = 0x5D;       /* key 1 */
+ 125   2              EFCON = 0x74;       /* key 2 */
+ 126   2          
+ 127   2              while( !( EFCON & 0x80) )
+ 128   2              {
+ 129   3              }
+ 130   2          
+ 131   2              EFCON &= ~0x80;
+ 132   2      
+ 133   2              /* flash need write triple ? */
+ 134   2              EFADR1 = (BYTE)(uAddr16 >> 8 );
+ 135   2              EFADR0 = (BYTE)uAddr16;
+ 136   2              
+ 137   2              EFBUF = *pBuf;
+ 138   2              
+ 139   2              EFCON = 0x5D;       /* key 1 */
+ 140   2              EFCON = 0x74;       /* key 2 */
+ 141   2          
+ 142   2              while( !( EFCON & 0x80) )
+ 143   2              {
+ 144   3              }
+ 145   2          
+ 146   2              EFCON &= ~0x80;
+ 147   2      
+ 148   2              pBuf ++;
+ 149   2          }
+ 150   1      }
+ 151          
+ 152          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    362    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      23
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

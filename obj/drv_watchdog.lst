@@ -1,0 +1,87 @@
+C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_WATCHDOG
+OBJECT MODULE PLACED IN .\obj\drv_watchdog.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_watchdog.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.
+                    -\code\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_wa
+                    -tchdog.lst) OBJECT(.\obj\drv_watchdog.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3                  
+   4          //------------------------------------------------------------------------
+   5          //      Description :   watchdog config
+   6          //      Parameters      :       t -> wdt ov time level
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2016 - 05 - 31
+  10          //------------------------------------------------------------------------
+  11          void watchdog_init(UINT8 t)
+  12          {
+  13   1              /* Select bank1 before set wdt register */
+  14   1          _sfrb_bank1();
+  15   1      
+  16   1              /* Write protect Key first */
+  17   1              WDTCNT = WDT_KEY;
+  18   1              /* WDT period */
+  19   1              WDTPR = 0xF7;
+  20   1              
+  21   1              /* Write protect Key first */
+  22   1              WDTCNT = WDT_KEY;
+  23   1              /* watchdog control register */
+  24   1              WDTCON = (0 << 7) | // WDTOV WDT time over flag
+  25   1                               (t << 4) | // WDTPS2[2~0] Pre-scaler select
+  26   1                               (1 << 3) | // WDTRE Reset Enable
+  27   1                               (0 << 2) | // WDTWE Wakeup Enable
+  28   1                               (0 << 1) | // WDTCS WDT Clock Select
+  29   1                               (1 << 0);  // WDTE WDT Enable
+  30   1      
+  31   1              /* Write protect Key first */
+  32   1              WDTCNT = WDT_KEY;
+  33   1              /* Clear WDT CNT */
+  34   1              WDTCNT = 0;
+  35   1      }
+  36          
+  37          
+  38          //------------------------------------------------------------------------
+  39          //      Description :   watchdog refresh
+  40          //      Parameters      :       None
+  41          //      Return          :       None
+  42          //      Author          :       Sycreader
+  43          //      Date            :       2016 - 05 - 31
+  44          //------------------------------------------------------------------------
+  45          void Watchdog_feed(void)
+  46          {
+  47   1          BOOL sfrb_bak = SFRB; // backup status
+  48   1      
+  49   1              /* Select bank1 */
+  50   1          _sfrb_bank1();
+  51   1              
+  52   1              /* Write protect Key first */
+  53   1              WDTCNT = WDT_KEY;
+C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/05/2018 10:27:16 PAGE 2   
+
+  54   1              
+  55   1              /* Clear WDT CNT */
+  56   1              WDTCNT = 0;
+  57   1              
+  58   1          SFRB = sfrb_bak; // restore status
+  59   1      }
+  60          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     43    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

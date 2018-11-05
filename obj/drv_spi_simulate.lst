@@ -1,0 +1,96 @@
+C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_SPI_SIMULATE
+OBJECT MODULE PLACED IN .\obj\drv_spi_simulate.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_spi_simulate.c LARGE BROWSE INTVECTOR(0X1800) INCD
+                    -IR(.\code\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\dr
+                    -v_spi_simulate.lst) OBJECT(.\obj\drv_spi_simulate.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          //------------------------------------------------------------------------
+   5          //      Description     :       mcu init
+   6          //      Parameters      :       None
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2016 - 05 - 31
+  10          //------------------------------------------------------------------------
+  11          void spi_init(void)
+  12          {
+  13   1          // Switch to BANK0
+  14   1              _sfrb_bank0();
+  15   1              
+  16   1              P3OE |= BIT_MASK(4); // SPI_CS
+  17   1              P34 = 1;
+  18   1              P3OE |= BIT_MASK(5); // SPI_CLK
+  19   1              P35 = 0;
+  20   1      
+  21   1          // Switch to BANK1
+  22   1              _sfrb_bank1();
+  23   1              P4OE |= BIT_MASK(5); // SPI_MOSI
+  24   1              P4IE |= BIT_MASK(4); // SPI_MISO
+  25   1      }
+  26          
+  27          //------------------------------------------------------------------------
+  28          //      Description     :       mcu init
+  29          //      Parameters      :       None
+  30          //      Return          :       None
+  31          //      Author          :       Sycreader
+  32          //      Date            :       2016 - 05 - 31
+  33          //------------------------------------------------------------------------
+  34          UINT8 spi_send_1byte(UINT8 byte)
+  35          {
+  36   1              UINT8 i, dat;
+  37   1                  
+  38   1              for(i = 0; i < 8; i++)
+  39   1              {
+  40   2              _sfrb_bank1();
+  41   2                      if(byte & 0x80)         // send bit
+  42   2                              SPI_DO_PIN = 1;
+  43   2                      else
+  44   2                              SPI_DO_PIN = 0;
+  45   2                      byte <<= 1;                     // next bit
+  46   2      
+  47   2                      _nop_();_nop_();
+  48   2                      
+  49   2              _sfrb_bank0();
+  50   2                      SPI_CLK_PIN = 1;        // pre edge
+  51   2      
+  52   2                      dat <<= 1;                      // next bit
+  53   2              _sfrb_bank1();
+C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/05/2018 10:27:16 PAGE 2   
+
+  54   2                      if(SPI_DI_PIN)          // sample bit
+  55   2                              dat |= 0x01;
+  56   2                      else
+  57   2                              dat &= 0xFE;
+  58   2      
+  59   2                      _nop_();_nop_();
+  60   2                      
+  61   2              _sfrb_bank0();
+  62   2                      SPI_CLK_PIN = 0;        // post edge
+  63   2              }
+  64   1              
+  65   1              return dat;
+  66   1      }
+  67          
+  68          
+  69          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     77    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

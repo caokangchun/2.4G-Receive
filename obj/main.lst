@@ -1,0 +1,158 @@
+C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\obj\main.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\app\src\main.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\app\i
+                    -nc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\main.lst) OBJECT(
+                    -.\obj\main.obj)
+
+line level    source
+
+   1          
+   2          //#message "OUR3025+xn297l Based 2.4G Wireless Sacnner"
+   3          
+   4          /**
+   5            ******************************************************************************
+   6            * @file       Project/code/app/src/main.c
+   7            * @author             Sycreader
+   8            * @version    V1.0
+   9            * @date               2015.02.07
+  10            ******************************************************************************
+  11            * @project    OUR3025 Based Wireless Data Transfer
+  12            * @COPYRIGHT  Shenzhen Sycreader RFID Co.Ltd
+  13            ******************************************************************************
+  14            */
+  15          
+  16          #include "includes.h"
+  17          
+  18             UINT8 xxx[]= "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\r";
+  19          
+  20          //BOOL ReceiveCompleteAck(void)
+  21          //{
+  22          //      UINT8 ack_tmp[4],ack_len;
+  23          //
+  24          //      rf_transceiver(RF_TRANSFER, RF_TX_TOUT,"1234", 4, ack_tmp, sizeof(ack_tmp), &ack_len);
+  25          //}
+  26          
+  27          
+  28          int main(void)
+  29          {
+  30   1              mcu_init();
+  31   1              //at24cxx_init();
+  32   1                  
+  33   1      #ifdef _RF_HOST
+                      rf_host.beep = TRUE;
+                      rf_host.status = RF_ONLINE;
+              #else // RF_SLAVE
+  37   1              rf_slave.status = RF_INITED;
+  38   1              rf_slave.pkt_id = INIT_ID;
+  39   1          //usb_connect();
+  40   1          UsbInit(uUsbType);
+  41   1      #endif
+  42   1      
+  43   1              EA = 1;
+  44   1              
+  45   1          if(rf_init())
+  46   1          {
+  47   2                  // RF init OK.
+  48   2                  beep_ctrl(2, 100);
+  49   2          }
+  50   1          
+  51   1      #ifdef RF_CARRIER
+                  RF_Carrier(0);
+                  //rf_host.status = RF_OFFLINE;
+C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 2   
+
+              #endif /* RF_CARRIER */
+  55   1      
+  56   1              while(1)
+  57   1              {
+  58   2                      watchdog_feed();
+  59   2                      
+  60   2              #ifdef _RF_HOST
+                              switch(rf_host.status)
+                              {
+                                      case RF_ONLINE:
+                                              /* rf tx uart data */
+                                              uart_to_rf();
+                                              
+                                              /* check battery */
+                                              bat_pwr_check();
+                                              break;
+              
+                                      case RF_PWR_OFF:
+                                              /* rf power down */
+                                              low_power_mode();
+                                              rf_host.status = RF_ONLINE;
+                                              break;
+                                              
+                                      default:
+                                              break;
+                              }
+                      #else /* _RF_SLAVE */
+  81   2                      switch(rf_slave.status)
+  82   2                      {
+  83   3                  #if 0//def _USB_CMD
+                                      case RF_HIDCON:
+                                              usb_int_disable();
+                                              rf_hid_cmd();
+                                              usb_int_enable();
+                                              rf_slave.status = RF_ONLINE;
+                                              break;
+                          #endif /* _USB_HID */
+  91   3                  
+  92   3                              case RF_ONLINE:
+  93   3                                      /* usb send rf data */
+  94   3                                      rf_to_usb(DATA_MODE);
+  95   3      
+  96   3                                 /*≤‚ ‘*/
+  97   3      //                                      usb_key_send(xxx,sizeof(xxx),0);
+  98   3      //                                      delay_1ms(500);
+  99   3      
+ 100   3      
+ 101   3      //                                      ReceiveCompleteAck();
+ 102   3      
+ 103   3                                      /*≤‚ ‘end*/
+ 104   3                                      break;
+ 105   3      
+ 106   3                              case RF_CONFIG:
+ 107   3                                      /* slave power on init */
+ 108   3                                      rf_slave_config();
+ 109   3                                      rf_slave.status = RF_ONLINE;
+ 110   3                                      break;
+ 111   3      
+ 112   3                              case RF_INITED:
+ 113   3                              //if(usb_connected())
+ 114   3                              rf_slave.status = RF_CONFIG;
+ 115   3                                  break;
+C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 3   
+
+ 116   3                                      
+ 117   3                              case RF_UPD_S:
+ 118   3                                  rf_slave_update();
+ 119   3                                      rf_slave.status = RF_ONLINE;
+ 120   3                                  break;
+ 121   3                                      
+ 122   3                              default:
+ 123   3                                      break;
+ 124   3                      }
+ 125   2              #endif
+ 126   2              }
+ 127   1      }
+ 128          
+ 129          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     98    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     64    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,344 @@
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE RF
+OBJECT MODULE PLACED IN .\obj\rf.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\app\src\rf.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\app\inc
+                    -;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\rf.lst) OBJECT(.\ob
+                    -j\rf.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          code UINT8 rf_ack[ACK_R][ACK_C] =
+   5          {
+   6                  STX, 0x01, 0xFE, ETX, 
+   7                  STX, 0x02, 0xFD, ETX, 
+   8                  STX, 0x03, 0xFC, ETX, 
+   9                  STX, 0x04, 0xFB, ETX, 
+  10          };
+  11          
+  12          code UINT8 rf_ch_list[PIPE_INDEX_MAX+1][CH_INDEX_MAX] = 
+  13          {
+  14          #if 0
+                  2, 34,62,
+                  5, 37,65,
+                  13,41,73,
+                  15,43,75,
+              
+                  4, 64,92, 
+                  //7, 67,95, 
+                  31,91,103,
+                  16,76,98, 
+                  18,78,100,
+              
+                  17,32,77,
+                  20,35,80,
+                  23,38,83,
+                  28,40,88,
+              
+                  19,79,94, 
+                  22,82,97, 
+                  26,86,101,
+                  31,91,103,
+              
+                  31,91,103,
+                  31,91,103,
+                  31,91,103,
+                  31,91,103,
+              
+                  31,91,103,
+                  31,91,103,
+                  31,91,103,
+                  31,91,103,
+                  31,91,103,
+                  
+                      8, 8, 8, // Sync channel
+              #else
+  49              0, 25,50,
+  50              1, 26,51,
+  51              2, 27,52,
+  52              3, 28,53,
+  53          
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 2   
+
+  54              4, 29,54, 
+  55              5, 30,55, 
+  56              6, 31,56, 
+  57              7, 32,57,
+  58          
+  59              8, 33,58,
+  60              9, 34,59,
+  61              10,35,60,
+  62              11,36,61,
+  63          
+  64              12,37,62, 
+  65              13,38,63, 
+  66              14,39,64,
+  67              15,40,65,
+  68          
+  69              16,41,66,
+  70              17,42,67,
+  71              18,43,68,
+  72              19,44,69,
+  73          
+  74              20,45,70,
+  75              21,46,71,
+  76              22,47,72,
+  77              23,48,73,
+  78              24,49,74,
+  79          
+  80                  80,80,80, // Sync channel
+  81          #endif
+  82          };
+  83          
+  84          
+  85          //---------------------------------------------------------------------------------------
+  86          //      Description     :       rf change to next channel
+  87          //      Parameters      :       none
+  88          //      Return          :       none
+  89          //      Author          :       RAY
+  90          //      Date            :       2013 - 08 - 18
+  91          //---------------------------------------------------------------------------------------
+  92          static void rf_goto_next_ch(void)
+  93          {
+  94   1              xn297l.ch_index++;
+  95   1      
+  96   1              /* get next channel index */
+  97   1              if(xn297l.ch_index == CH_INDEX_MAX)
+  98   1              {
+  99   2                      xn297l.ch_index = 0;
+ 100   2              }
+ 101   1      }
+ 102          
+ 103          
+ 104          //---------------------------------------------------------------------------------------
+ 105          //      Description     :       rf change to next pipe
+ 106          //      Parameters      :       none
+ 107          //      Return          :       none
+ 108          //      Author          :       RAY
+ 109          //      Date            :       2013 - 08 - 18
+ 110          //---------------------------------------------------------------------------------------
+ 111          #if 0
+              static void rf_goto_next_pipe(void)
+              {
+                      xn297l.pipe_index++;
+              
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 3   
+
+                      /* get next channel index */
+                      if(xn297l.pipe_index == PIPE_INDEX_MAX)
+                      {
+                              xn297l.pipe_index = 0;
+                      }
+              }
+              #else
+ 123          void rf_set_pipe(UINT8 pipe_x)
+ 124          {
+ 125   1              xn297l.pipe_index = pipe_x;// & 0x0F;
+ 126   1      }
+ 127          #endif
+ 128          
+ 129          
+ 130          //---------------------------------------------------------------------------------------
+ 131          //      Description     :       rf channel no
+ 132          //      Parameters      :       none
+ 133          //      Return          :       none
+ 134          //      Author          :       RAY
+ 135          //      Date            :       2013 - 08 - 18
+ 136          //---------------------------------------------------------------------------------------
+ 137          static void rf_get_ch_no(void)
+ 138          {
+ 139   1              xn297l.ch_no = rf_ch_list[xn297l.pipe_index][xn297l.ch_index];
+ 140   1      }
+ 141          
+ 142          
+ 143          //---------------------------------------------------------------------------------------
+ 144          //      Description     :       rf channel no
+ 145          //      Parameters      :       none
+ 146          //      Return          :       none
+ 147          //      Author          :       RAY
+ 148          //      Date            :       2013 - 08 - 18
+ 149          //---------------------------------------------------------------------------------------
+ 150          UINT8 rf_set_ch(void)
+ 151          {
+ 152   1              UINT8 ch_no;
+ 153   1              
+ 154   1              /* rf goto next channel */
+ 155   1              rf_goto_next_ch();
+ 156   1      
+ 157   1              /* rf get ch no */
+ 158   1              rf_get_ch_no();
+ 159   1      
+ 160   1              /* set rf channel */
+ 161   1              xn297l_set_channel(xn297l.ch_no);
+ 162   1      
+ 163   1              /* read out current rf ch no */
+ 164   1              xn297l_read_1byte(REG_RF_CH | CMD_R_REGISTER, &ch_no);
+ 165   1      
+ 166   1              return ch_no;
+ 167   1      }
+ 168          
+ 169          code UINT8 mac_dat[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+ 170          //---------------------------------------------------------------------------------------
+ 171          //      Description     :       rf get mac
+ 172          //      Parameters      :       none
+ 173          //      Return          :       none
+ 174          //      Author          :       RAY
+ 175          //      Date            :       2016 - 06 - 02
+ 176          //---------------------------------------------------------------------------------------
+ 177          void rf_get_mac(UINT8 *mac)
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 4   
+
+ 178          {
+ 179   1      #if 0
+                      memcpy(mac, mac_dat, 4);
+              #else
+ 182   1          UINT8 snr[8];
+ 183   1          RdSerialNum(snr);
+ 184   1          memcpy(mac, &snr[4], 4);
+ 185   1      #endif /* 0 */
+ 186   1      }
+ 187          
+ 188          //---------------------------------------------------------------------------------------
+ 189          //      Description     :       rf set mac
+ 190          //      Parameters      :       none
+ 191          //      Return          :       none
+ 192          //      Author          :       RAY
+ 193          //      Date            :       2016 - 06 - 02
+ 194          //---------------------------------------------------------------------------------------
+ 195          void rf_set_mac(UINT8 *mac)
+ 196          {
+ 197   1              xn297l_set_mac(mac);
+ 198   1      }
+ 199          
+ 200          //---------------------------------------------------------------------------------------
+ 201          //      Description     :       rf init
+ 202          //      Parameters      :       none
+ 203          //      Return          :       true/false - init success/fail
+ 204          //      Author          :       RAY
+ 205          //      Date            :       2013 - 08 - 18
+ 206          //---------------------------------------------------------------------------------------
+ 207          BOOL rf_init(void)
+ 208          {
+ 209   1              UINT8 i;
+ 210   1              
+ 211   1      #ifndef _SPI_HARDWARE
+ 212   1              //spi_half_duplex_init(); // mode 0, 1
+ 213   1              spi_init();
+ 214   1      #else
+                      serial_baud(xn297l_spi_no, SPEED_3M);
+              #endif
+ 217   1      
+ 218   1              rf_get_mac(xn297l.mac);
+ 219   1              rf_set_pipe((xn297l.mac[3] + 1) % PIPE_INDEX_MAX);
+ 220   1      
+ 221   1              /* try init rf for 3 times */
+ 222   1              for(i = 0; i < 3; i++)
+ 223   1              {
+ 224   2                      if(xn297l_init())
+ 225   2                      {       
+ 226   3                              //printf("rf init ok.\r\n");
+ 227   3                              //uart0_send_byte('O');
+ 228   3                              //uart0_send_byte('K');
+ 229   3                  rf_set_ch();
+ 230   3                              xn297l_goto_sleep();
+ 231   3                              //RF_Carrier(8);
+ 232   3                              return TRUE;
+ 233   3                      }
+ 234   2      
+ 235   2                      delay_1ms(10);
+ 236   2              }
+ 237   1      
+ 238   1      #if 0
+                      while(1); // for reset
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 5   
+
+              #endif
+ 241   1              return FALSE;
+ 242   1      }
+ 243          
+ 244          
+ 245          //---------------------------------------------------------------------------------------
+ 246          //      Description     :       rf send data
+ 247          //      Parameters      :       none
+ 248          //      Return          :       none
+ 249          //      Author          :       RAY
+ 250          //      Date            :       2013 - 08 - 18
+ 251          //---------------------------------------------------------------------------------------
+ 252          BOOL rf_transceiver (
+ 253                  RF_DIR rf_dir, UINT8 t_out,
+ 254                  UINT8 *tx_src, UINT8 tx_len,
+ 255                  UINT8 *rx_dst, UINT8 dst_len, UINT8 *rx_len
+ 256          )
+ 257          {
+ 258   1              BOOL flag = FALSE;
+ 259   1      
+ 260   1              /* rf wakeup first */
+ 261   1              xn297l_goto_wakeup();
+ 262   1      
+ 263   1              while(1)
+ 264   1              {
+ 265   2                      flag = xn297l_transceive(rf_dir, 0, t_out, \
+ 266   2                                                                       tx_src, tx_len, \
+ 267   2                                                                       rx_dst, dst_len, rx_len);
+ 268   2                      //printf("*");
+ 269   2              //uart_send_byte('*');
+ 270   2                      
+ 271   2              #ifdef _RF_HOST
+                              /* rx ack ok */
+                              if(flag)
+                              {
+                                      break;
+                              }
+              
+              
+                              /* rf send timeout */
+                              if(rf_tx_tout(TX_OUT))
+                              {
+                                      break;
+                              }
+                      #else // _RF_SLAVE
+ 285   2                      /* wait untill receive data */
+ 286   2                      if(flag)
+ 287   2                      {
+ 288   3                              break;
+ 289   3                      }
+ 290   2                      
+ 291   2                      /* rf recv timeout */
+ 292   2                      if(rf_rx_tout())
+ 293   2                      {
+ 294   3                              break;
+ 295   3                      }
+ 296   2              #endif
+ 297   2                      
+ 298   2                      rf_set_ch();
+ 299   2                      
+ 300   2                      watchdog_feed();
+ 301   2              }
+C51 COMPILER V9.01   RF                                                                    11/05/2018 10:27:15 PAGE 6   
+
+ 302   1              
+ 303   1              /* rf goto sleep */
+ 304   1              xn297l_goto_sleep();
+ 305   1      
+ 306   1              return flag;
+ 307   1      }
+ 308          
+ 309          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    341    ----
+   CONSTANT SIZE    =     98    ----
+   XDATA SIZE       =   ----      26
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

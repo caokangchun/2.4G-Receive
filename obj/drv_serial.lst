@@ -1,0 +1,117 @@
+C51 COMPILER V9.01   DRV_SERIAL                                                            11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_SERIAL
+OBJECT MODULE PLACED IN .\obj\drv_serial.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_serial.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\c
+                    -ode\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_seri
+                    -al.lst) OBJECT(.\obj\drv_serial.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          //------------------------------------------------------------------------
+   5          //      Description     :       serial baudrate
+   6          //      Parameters      :       None
+   7          //      Return          :       None
+   8          //      Author          :       Sycreader
+   9          //      Date            :       2014 - 02 - 17
+  10          //------------------------------------------------------------------------
+  11          void serial_baud(SERIAL_NO sx, SERIAL_BUAD baud)
+  12          {
+  13   1              _sfrb_bank1();
+  14   1              if(S0 == sx)    SPI0BR = baud;
+  15   1              else                    SPI1BR = baud;
+  16   1      }
+  17          
+  18          
+  19          //------------------------------------------------------------------------
+  20          //      Description     :       serial disable
+  21          //      Parameters      :       None
+  22          //      Return          :       None
+  23          //      Author          :       Sycreader
+  24          //      Date            :       2014 - 02 - 17
+  25          //------------------------------------------------------------------------
+  26          void serial_reset(SERIAL_NO sx)
+  27          {
+  28   1              _sfrb_bank1();
+  29   1              if(S0 == sx)    SPI0CON = 0x00;
+  30   1              else                    SPI1CON = 0x00;
+  31   1      }
+  32          
+  33          
+  34          //------------------------------------------------------------------------
+  35          //      Description     :       serial mode config
+  36          //      Parameters      :       None
+  37          //      Return          :       None
+  38          //      Author          :       Sycreader
+  39          //      Date            :       2014 - 02 - 17
+  40          //------------------------------------------------------------------------
+  41          void serial_mode(SERIAL_NO sx, SERIAL_MODE m)
+  42          {
+  43   1              UINT8 sxcon;
+  44   1          
+  45   1              sxcon = (0 << 7) | // Finish
+  46   1                              (0 << 6) | // IIC ACK bit for read
+  47   1                              (1 << 5) | // Enable, 1 for enable
+  48   1                              (0 << 4) | // Start
+  49   1                              (m << 0);  // Mode
+  50   1                              
+  51   1              _sfrb_bank1();
+  52   1              if(S0 == sx)    SPI0CON = sxcon;
+  53   1              else                    SPI1CON = sxcon;
+C51 COMPILER V9.01   DRV_SERIAL                                                            11/05/2018 10:27:16 PAGE 2   
+
+  54   1      }
+  55          
+  56          
+  57          //------------------------------------------------------------------------
+  58          //      Description     :       serial send data
+  59          //      Parameters      :       None
+  60          //      Return          :       None
+  61          //      Author          :       Sycreader
+  62          //      Date            :       2014 - 02 - 17
+  63          //------------------------------------------------------------------------
+  64          UINT8 serial_transceive(SERIAL_NO sx, UINT8 dat)
+  65          {
+  66   1          UINT8 buf_dat;
+  67   1          
+  68   1              _sfrb_bank1();
+  69   1              if(S0 == sx)
+  70   1              {
+  71   2                      SPI0BUF = dat;              // send dat
+  72   2                      SPI0CON |= 0x10;            // start
+  73   2                      //mcu_hold();               // cpu idle
+  74   2                      while(!(SPI0CON & 0x80));       // wait complete
+  75   2                      SPI0CON &= ~0x90;                   // clear flag
+  76   2                      buf_dat = SPI0BUF;          // recv data
+  77   2              }
+  78   1              else
+  79   1              {
+  80   2                      SPI1BUF = dat;              // send dat
+  81   2                      SPI1CON |= 0x10;            // start
+  82   2                      //mcu_hold();               // cpu idle
+  83   2                      while(!(SPI1CON & 0x80));       // wait complete
+  84   2                      SPI1CON &= ~0x90;                   // clear flag
+  85   2                      buf_dat = SPI1BUF;          // recv data
+  86   2              }
+  87   1      
+  88   1          return buf_dat;
+  89   1      }
+  90          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     84    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

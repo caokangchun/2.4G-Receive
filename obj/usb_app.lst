@@ -1,0 +1,361 @@
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE USB_APP
+OBJECT MODULE PLACED IN .\obj\usb_app.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\app\src\usb_app.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\ap
+                    -p\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\usb_app.lst) O
+                    -BJECT(.\obj\usb_app.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          #ifdef _USB_CMD
+   5          
+   6          xdata usb_report_s usb_report _at_ 0x8200;// = {0};
+   7          
+   8          /*************************************************************************
+   9          *       Function        :       usb_report_init
+  10          *       Description :   init report data 
+  11          *       Parameters      :       data_length -> report valid data length
+  12          *       Return          :       None
+  13          *       Author          :       Sycreader
+  14          *       Date            :       2013 - 09 - 17
+  15          ***************************************************************************/
+  16          static void usb_report_init(UINT8 data_length)
+  17          {
+  18   1              /* clear usb report buff data first */
+  19   1              memset(usb_report.dat_buff, 0 , _HID_CMD_LEN);
+  20   1              
+  21   1              usb_report.dat_buff[0] = 0x03;  // report id + 7 bytes 0
+  22   1              // between all be zero
+  23   1              usb_report.dat_buff[8] = 0xAA;//STX;    // data head
+  24   1              usb_report.dat_buff[9] = 0;     // machine id
+  25   1              usb_report.dat_buff[10] = data_length;//data length     
+  26   1              //user data proc...
+  27   1              usb_report.dat_buff[data_length + 12] = 0xBB;//ETX; // data end
+  28   1      }
+  29          
+  30          
+  31          /*************************************************************************
+  32          *       Function        :       usb_return_status
+  33          *       Description :   return err report 
+  34          *       Parameters      :       err_type -> error type
+  35          *       Return          :       None
+  36          *       Author          :       Sycreader
+  37          *       Date            :       2013 - 10 - 28
+  38          ***************************************************************************/
+  39          static void usb_ret_datas(void)
+  40          {
+  41   1          _sfrb_bank1();
+  42   1      
+  43   1              //Ep0_Send_Table(usb_report.dat_buff, 256);
+  44   1              Ep0_Send_Table(usb_report.dat_buff, usb_report.dat_buff[10] + 5 + _CMD_STX_LEN);
+  45   1      }
+  46          
+  47          
+  48          /*************************************************************************
+  49          *       Function        :       usb_return_status
+  50          *       Description :   return err report 
+  51          *       Parameters      :       err_type -> error type
+  52          *       Return          :       None
+  53          *       Author          :       Sycreader
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 2   
+
+  54          *       Date            :       2013 - 10 - 28
+  55          ***************************************************************************/
+  56          static void usb_ret_status(UINT8 status, UINT8 ret_type)
+  57          {
+  58   1              usb_report_init(2); // 2 bytes data
+  59   1      
+  60   1              usb_report.dat_buff[11] = status;       // STATUS
+  61   1              usb_report.dat_buff[12] = ret_type;     // ok
+  62   1              
+  63   1              /* XOR check for valid data (except STX+ETX) */
+  64   1              usb_report.dat_buff[13] = usb_report.dat_buff[10] ^ \
+  65   1                                                                usb_report.dat_buff[11] ^ \
+  66   1                                                                usb_report.dat_buff[12];
+  67   1          usb_ret_datas();
+  68   1      }
+  69          
+  70          /*************************************************************************
+  71          *       Function        :       usb_set_report
+  72          *       Description :   usb set report
+  73          *       Parameters      :       ulen -> fifo data length, pCmd -> usb cmd data
+  74          *       Return          :       None
+  75          *       Author          :       Sycreader
+  76          *       Date            :       2013 - 09 - 17
+  77          ***************************************************************************/
+  78          void usb_report_out(UINT8 dat_cnt)
+  79          {   
+  80   1              if(0 == usb_report.dat_total)
+  81   1              {
+  82   2                      /* first time get valid data total length */
+  83   2                      usb_report.dat_total = _wLengthl;
+  84   2                      usb_report.dat_index = 0;
+  85   2      
+  86   2              if(dat_cnt > _CMD_STX_LEN)
+  87   2              {
+  88   3                      memcpy(&usb_report.dat_buff[usb_report.dat_index], &uEP0InOut[8], dat_cnt - _CMD_STX_LEN);
+  89   3                      usb_report.dat_index += (dat_cnt - _CMD_STX_LEN);
+  90   3                      }
+  91   2              }
+  92   1              else
+  93   1              {
+  94   2              memcpy(&usb_report.dat_buff[usb_report.dat_index], uEP0InOut, dat_cnt);
+  95   2              usb_report.dat_index += dat_cnt;
+  96   2              }
+  97   1      }
+  98          
+  99          /*************************************************************************
+ 100          *       Function        :       usb_get_report
+ 101          *       Description :   usb get report
+ 102          *       Parameters      :       None
+ 103          *       Return          :       None
+ 104          *       Author          :       Sycreader
+ 105          *       Date            :       2013 - 09 - 17
+ 106          ***************************************************************************/
+ 107          void usb_report_in(void)
+ 108          {
+ 109   1              switch(usb_report.dat_buff[3]) // usb hid cmd
+ 110   1              {
+ 111   2                  case IAP_JUMP_S :
+ 112   2                      rf_slave.status = RF_UPD_S;
+ 113   2                      usb_ret_status(STATUS_OK, SET_OK);
+ 114   2                      break;
+ 115   2                      
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 3   
+
+ 116   2                      default:
+ 117   2                              usb_ret_status(STATUS_ERR, CMD_ERR); // error cmd
+ 118   2                              break;
+ 119   2              }
+ 120   1      }
+ 121          
+ 122          #endif /* _USB_HID */
+ 123          
+ 124          #ifdef _USB_TX
+ 125          
+ 126          #include "ascii2hid.h"
+ 127          
+ 128          //idata UINT8 usb_speed = 0;
+ 129          
+ 130          //;-------------------------------------------------------------;
+ 131          //; usb vcom send data, use ep2                                 ;
+ 132          //;-------------------------------------------------------------;
+ 133          void usb_speed_set(UINT8 usb_speed)
+ 134          {
+ 135   1          if(usb_speed == 0)
+ 136   1          {
+ 137   2              // No Delay.
+ 138   2          }
+ 139   1          else if(usb_speed == 1)
+ 140   1          {
+ 141   2              delay_1ms(1); // 1CHAR = 4MS
+ 142   2          }
+ 143   1          else if(usb_speed == 2)
+ 144   1          {
+ 145   2              delay_1ms(3); // 1CHAR = 8MS
+ 146   2          }
+ 147   1          else
+ 148   1          {
+ 149   2              delay_1ms(7); // 1CHAR = 16MS
+ 150   2          }
+ 151   1      }
+ 152          
+ 153          //;-------------------------------------------------------------;
+ 154          //; usb vcom send data, use ep2                                 ;
+ 155          //;-------------------------------------------------------------;
+ 156          void usb_gbk_input(UINT16 gbk)
+ 157          {
+ 158   1          UINT8 i, key[5];
+ 159   1      
+ 160   1          key[4] = gbk % 10;
+ 161   1          gbk /= 10;
+ 162   1          key[3] = gbk % 10;
+ 163   1          gbk /= 10;
+ 164   1          key[2] = gbk % 10;
+ 165   1          gbk /= 10;
+ 166   1          key[1] = gbk % 10;
+ 167   1          gbk /= 10;
+ 168   1          key[0] = gbk % 10;
+ 169   1          
+ 170   1          usb_key_report(0x40, 0);
+ 171   1          for(i = 0; i < 5; i++)
+ 172   1          {
+ 173   2              if(key[i] == 0)
+ 174   2              {
+ 175   3                  key[i] = hid_nk_0;
+ 176   3              }
+ 177   2              else
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 4   
+
+ 178   2              {
+ 179   3                  key[i] = key[i]-1+hid_nk_1;
+ 180   3              }
+ 181   2              usb_key_report(0x40, key[i]);
+ 182   2              usb_key_report(0x40, 0);
+ 183   2          }
+ 184   1          usb_key_report(0, 0);
+ 185   1      }
+ 186          
+ 187          /*************************************************************************
+ 188          *       Function        :       usb_key_send
+ 189          *       Description :   usb send usb key value
+ 190          *       Parameters      :       --send_buff -> pointer to data buff to be send
+ 191          *                                       --length -> send data length
+ 192          *                                       --type -> 0 : Composite keys, !0 : single keys
+ 193          *       Return          :       None
+ 194          *       Author          :       Sycreader
+ 195          *       Date            :       2016 - 05 - 25
+ 196          ***************************************************************************/
+ 197          BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
+ 198          {
+ 199   1              UINT8 dat_buff[8] = {0};
+ 200   1              UINT8 index;
+ 201   1              UINT8 tmp;
+ 202   1              UINT8 speed;
+ 203   1              
+ 204   1          while(length--)
+ 205   1          {
+ 206   2              /* usb device should have enum finished and not in suspend state */
+ 207   2              if(( uDevState != _U_CONFIGURED_STATE_ ) || ( uUsbState & _U_SUSPEND_ ))
+ 208   2              {
+ 209   3                  delay_1ms(50);
+ 210   3                  return FALSE;
+ 211   3              }
+ 212   2              
+ 213   2              watchdog_feed();
+ 214   2      
+ 215   2              {
+ 216   3                  UINT8 lang;
+ 217   3                  //LANG lang_p;
+ 218   3                  
+ 219   3                      index = *send_buff++;
+ 220   3      
+ 221   3              #if 0
+                          if(index > 0x7F)//0xC0) // out of range
+                          {
+                              continue;
+                          }
+                      #else
+ 227   3                  if(index == 0xFF) // gbk head sign
+ 228   3                  {
+ 229   4                      if(length >= 2)
+ 230   4                      {
+ 231   5                          UINT16 gbk;
+ 232   5                          
+ 233   5                          gbk = *send_buff++;
+ 234   5                          gbk <<= 8;
+ 235   5                          gbk += *send_buff++;
+ 236   5                          length -=2;
+ 237   5                          
+ 238   5                          usb_gbk_input(gbk);
+ 239   5                          continue;
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 5   
+
+ 240   5                      }
+ 241   4                      else // not valid len
+ 242   4                      {
+ 243   5                          return FALSE;
+ 244   5                      }
+ 245   4                  }
+ 246   3              #endif /* 0 */
+ 247   3      
+ 248   3                  if(index < 0x20)
+ 249   3                  {
+ 250   4                      lang = 0;
+ 251   4                  }
+ 252   3                  else
+ 253   3                              {
+ 254   4                      lang = type & 0x0F;
+ 255   4                      if(lang > 9) // 0 ~ 6
+ 256   4                      {
+ 257   5                          lang = 0;
+ 258   5                      }
+ 259   4                                      
+ 260   4                                      if(lang != 0)
+ 261   4                      {
+ 262   5                          index -= 0x20;
+ 263   5                      }
+ 264   4                              }
+ 265   3      
+ 266   3                              //language(lang, index, &lang_p);
+ 267   3                  //tmp = lang_p.hid;
+ 268   3                  tmp = (lang_ptr[lang])[index].hid;
+ 269   3                  
+ 270   3                  if(tmp == 0x00)
+ 271   3                      continue;
+ 272   3                      
+ 273   3                  dat_buff[2] = tmp;
+ 274   3                  dat_buff[0] = (lang_ptr[lang])[index].func;
+ 275   3                  //dat_buff[0] = lang_p.func;
+ 276   3      
+ 277   3                  #if 0
+                              if(caps_lock) // CAPS status ON
+                              {
+                                              if(dat_buff[0] == 0x20)
+                                              {
+                                              if((index >= 'A') && (index <= 'Z'))
+                                              {
+                                                      dat_buff[0] = 0; // no SHIFT for Upper
+                                              }
+                                      }
+                                      else if(dat_buff[0] == 0)
+                                      {
+                                              if((index >= 'a') && (index <= 'z'))
+                                              {
+                                                      dat_buff[0] = 0x20; // need SHIFT for Lower
+                                              }
+                                      }
+                              }
+                          #endif /* 0 */
+ 296   3                      }
+ 297   2      
+ 298   2              speed = (type >> 6) & 0x03;
+ 299   2      
+ 300   2              /* USB Key Send */
+ 301   2                      Ep1_Send(dat_buff, 8);
+C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 6   
+
+ 302   2              usb_speed_set(speed);
+ 303   2              
+ 304   2              /* USB key Clear */
+ 305   2                      dat_buff[0] = 0;
+ 306   2                      dat_buff[2] = 0;
+ 307   2                      Ep1_Send(dat_buff, 8);
+ 308   2                      usb_speed_set(speed);
+ 309   2          }
+ 310   1      
+ 311   1          return TRUE;
+ 312   1      }
+ 313          #endif /* _USB_TX */
+ 314          
+ 315          void usb_int_disable(void)
+ 316          {
+ 317   1          _sfrb_bank0();
+ 318   1          IE2 &= ~ 0x03;
+ 319   1      }
+ 320          
+ 321          void usb_int_enable(void)
+ 322          {
+ 323   1          _sfrb_bank0();
+ 324   1          IE2 |= 0x03;
+ 325   1      }
+ 326          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    992    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   ----      31
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

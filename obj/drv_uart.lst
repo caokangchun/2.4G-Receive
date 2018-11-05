@@ -1,0 +1,177 @@
+C51 COMPILER V9.01   DRV_UART                                                              11/05/2018 10:27:16 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE DRV_UART
+OBJECT MODULE PLACED IN .\obj\drv_uart.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\driver\src\drv_uart.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\cod
+                    -e\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_uart.l
+                    -st) OBJECT(.\obj\drv_uart.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          #ifdef _UART_EN
+   5          
+   6          //------------------------------------------------------------------------
+   7          //      Description     :       UART hartware init
+   8          //      Parameters      :       none
+   9          //      Return          :       none
+  10          //      Author          :       Sycreader
+  11          //      Date            :       2012 - 12 - 25
+  12          //------------------------------------------------------------------------
+  13          void uart0_init(UINT16 baud_rate, UART_MODE m)
+  14          {
+  15   1              UINT8 h, l;
+  16   1          
+  17   1              h = (baud_rate >> 8) & 0x0F;
+  18   1              l = baud_rate & 0xFF;
+  19   1              
+  20   1              /* Select bank1 before set UART register */
+  21   1          _sfrb_bank1();
+  22   1                              
+  23   1              UT0CON0 = (1 << 7) | // UT0E Enable UART0, must be set first
+  24   1                        (0 << 6) | // UT0RO Data overrun when receive data
+  25   1                                (0 << 5) | // UT0RF Uart RX data flag
+  26   1                                (0 << 4) | // UT0TF Uart TX data flag
+  27   1                                (1 << 3) | // UT0RE Enable UART RX data
+  28   1                                (0 << 2) | // UT0TS TX satrt
+  29   1                                (0 << 1) | // UT0RD8 Read only, the 9th bit data, used only in mode 2
+  30   1                                (0 << 0);  // UT0TD8 Write only, the 9th bit data, used only in mode 2
+  31   1      
+  32   1          /* uart bit period = UT0CON1[3~0] UT0BR[7~0] */
+  33   1          /* uart mode = UT0CON1[6~4] */
+  34   1              UT0CON1 = (0 << 7) | // Not used
+  35   1                                (m << 4) | // Mode
+  36   1                                (h << 0);  // 
+  37   1              
+  38   1              UT0BR = l;
+  39   1      }
+  40          
+  41          #ifdef _UART_TX
+  42          //------------------------------------------------------------------------
+  43          //      Description     :       uart send data
+  44          //      Parameters      :       dat -> data to be send
+  45          //      Return          :       None
+  46          //      Author          :       Sycreader
+  47          //      Date            :       2012 - 12 - 25
+  48          //------------------------------------------------------------------------
+  49          void uart0_send_byte(UINT8 dat)
+  50          {
+  51   1          BOOL sfrb_bak = SFRB; // backup status
+  52   1              
+  53   1          // Switch to BANK1
+C51 COMPILER V9.01   DRV_UART                                                              11/05/2018 10:27:16 PAGE 2   
+
+  54   1          _sfrb_bank1();
+  55   1              
+  56   1              UT0BUF = dat;   // data to buff
+  57   1              UT0TS = 1;              // start tx
+  58   1              //mcu_hold();           // cpu idle
+  59   1              while(!UT0TF);  // wait tx done
+  60   1              UT0TF = 0;              // clear flag
+  61   1      
+  62   1          SFRB = sfrb_bak; // restore status
+  63   1      }
+  64          
+  65          //------------------------------------------------------------------------
+  66          //      Description     :       uart send data
+  67          //      Parameters      :       dat -> data to be send
+  68          //      Return          :       None
+  69          //      Author          :       Sycreader
+  70          //      Date            :       2012 - 12 - 25
+  71          //------------------------------------------------------------------------
+  72          void uart0_tx_datas(UINT8 *pdat, UINT16 len)
+  73          {
+  74   1          UINT16 i;
+  75   1      
+  76   1          for(i = 0; i < len; i++)
+  77   1          {
+  78   2              uart0_send_byte(pdat[i]);
+  79   2          }
+  80   1      }
+  81          
+  82          #ifdef _PRINTF
+              unsigned char Hex2Ascii( unsigned char uDat )
+              {
+                  if( uDat < 0x0A )
+                      return ('0' + uDat);
+                  else
+                      return ( 'A' + uDat - 0x0A );
+              }
+              
+              void UartSendHex(BYTE uDat )
+              {   
+                  UartSendAscii( Hex2Ascii( (uDat & 0xF0) >> 4 ) );
+                  UartSendAscii( Hex2Ascii( uDat & 0x0F ) );
+              }
+              
+              void printf(const char *fmt,...) reentrant
+              {
+                  short nTemp16;
+                  void *pList = (BYTE*)&fmt + sizeof(fmt); 
+              
+                  while( *fmt )
+                  {
+                      if(*fmt == '%')
+                      {
+                          fmt ++;
+                          switch (*fmt)
+                          {
+                          case 'x':
+                              {
+                                  nTemp16 = *(uint16*)pList;
+                                  UartSendHex( nTemp16 );
+                                  pList = ((uint16*)pList) + 1;
+                                  break;
+                              }
+C51 COMPILER V9.01   DRV_UART                                                              11/05/2018 10:27:16 PAGE 3   
+
+                          case 'X':
+                              {
+                                  nTemp16 = *(uint16*)pList;
+                                  UartSendHex( (nTemp16 >> 8) );
+                                  UartSendHex( nTemp16 );
+                                  pList = ((uint16*)pList) + 1;
+                                  break;
+                              }
+                              
+                          default: 
+                              break;                                                                                    
+             -      
+                          }
+                      }
+                      else if( *fmt == 0x0A )
+                      {
+                          UartSendAscii( 0x0D );
+                          UartSendAscii( 0x0A );
+                      }
+                      else 
+                      {
+                          UartSendAscii(*fmt);
+                      }
+              
+                      fmt ++;
+                  }
+              }
+              #endif /* _PRINTF */
+ 143          
+ 144          #endif /* _UART_TX */
+ 145          
+ 146          #endif /* _UART_EN */
+ 147          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    110    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       5
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,1 @@
+"code\driver\src\drv_clock.c" LARGE BROWSE INTVECTOR(0x1800) INCDIR(.\code\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE (__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\drv_clock.lst) OBJECT(.\obj\drv_clock.obj)

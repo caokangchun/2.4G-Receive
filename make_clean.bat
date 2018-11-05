@@ -1,0 +1,1 @@
+del /S *.lst *.m51 *.obj *.__i *.bak *.rcf *.lnp *.plg *.o *.pbi *.cout *.out *.map *.pbd *.browse

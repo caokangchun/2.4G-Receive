@@ -1,0 +1,1 @@
+"code\system\src\it_config.c" LARGE BROWSE INTVECTOR(0x1800) INCDIR(.\code\app\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE (__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\it_config.lst) OBJECT(.\obj\it_config.obj)

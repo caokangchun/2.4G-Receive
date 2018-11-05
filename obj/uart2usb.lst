@@ -1,0 +1,1470 @@
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE UART2USB
+OBJECT MODULE PLACED IN .\obj\uart2usb.obj
+COMPILER INVOKED BY: D:\Keil_v511\C51\BIN\C51.EXE code\app\src\uart2usb.c LARGE BROWSE INTVECTOR(0X1800) INCDIR(.\code\a
+                    -pp\inc;.\code\driver\inc;.\code\system\inc;.\code\usb) DEFINE(__KEIL_C51__) DEBUG OBJECTEXTEND PRINT(.\obj\uart2usb.lst)
+                    - OBJECT(.\obj\uart2usb.obj)
+
+line level    source
+
+   1          
+   2          #include "includes.h"
+   3          
+   4          
+   5          #ifdef _UART2USB
+   6          
+   7          //0xaa,spid,reserve,0x55
+   8          static uint8_t spidAck[4]={0xaa,0,0,0x55};
+   9          
+  10          typedef struct
+  11          {
+  12                  UINT8 prefix1;
+  13                  UINT8 prefix2;
+  14                  UINT8 sid;
+  15                  UINT8 crc;
+  16          }CMD_UPLOAD;
+  17          
+  18          static unsigned char crc_high_first(unsigned char *ptr, unsigned char len)
+  19          {
+  20   1          unsigned char i; 
+  21   1          unsigned char crc=0x00; /* 计算的初始crc值 */ 
+  22   1      
+  23   1          while(len--)
+  24   1          {
+  25   2              crc ^= *ptr++;  /* 每次先与需要计算的数据异或,计算完指向下一数据 */  
+  26   2              for (i=8; i>0; --i)   /* 下面这段计算过程与计算一个字节crc一样 */  
+  27   2              { 
+  28   3                  if (crc & 0x80)
+  29   3                      crc = (crc << 1) ^ 0x31;
+  30   3                  else
+  31   3                      crc = (crc << 1);
+  32   3              }
+  33   2          }
+  34   1      
+  35   1          return (crc); 
+  36   1      }
+  37          
+  38          static BOOL     isCmdPkt(unsigned char *ptr, unsigned char len)
+  39          {
+  40   1              //判断长度
+  41   1              //判断前序
+  42   1              //判断crc
+  43   1              CMD_UPLOAD *cmdPtr = (CMD_UPLOAD*)ptr;
+  44   1              UINT8 crc;
+  45   1              
+  46   1      //      if(len != sizeof(CMD_UPLOAD))
+  47   1      //      {
+  48   1      //              return FALSE;
+  49   1      //      }
+  50   1      
+  51   1              if((cmdPtr->prefix1 != 0xfe) || (cmdPtr->prefix2 != 0xef))
+  52   1              {
+  53   2                      return FALSE;
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 2   
+
+  54   2              }
+  55   1      
+  56   1      //      crc = crc_high_first(ptr,len);
+  57   1      //      if(crc != cmdPtr->crc)
+  58   1      //      {
+  59   1      //              return FALSE;
+  60   1      //      }
+  61   1      
+  62   1              return TRUE;
+  63   1              
+  64   1      }
+*** WARNING C280 IN LINE 38 OF CODE\APP\SRC\UART2USB.C: 'len': unreferenced local variable
+*** WARNING C280 IN LINE 44 OF CODE\APP\SRC\UART2USB.C: 'crc': unreferenced local variable
+  65          
+  66          
+  67          
+  68          
+  69          static BOOL checkData(unsigned char *ptr, UINT16 len)
+  70          {
+  71   1              UINT8 crc;
+  72   1              
+  73   1              crc = crc_high_first(ptr,len-1);
+  74   1              if(crc == ptr[len-1])
+  75   1              {
+  76   2                      return TRUE;
+  77   2              }
+  78   1      
+  79   1              return FALSE;
+  80   1      }
+  81          
+  82          static BOOL ReceiveCompleteAck(UINT8 pid)
+  83          {
+  84   1              UINT8 ack_tmp[4],ack_len,n=2;
+  85   1      
+  86   1              spidAck[1] = pid;       //写入回复信息中
+  87   1              rf_slave.rx_tout = 0;
+  88   1      
+  89   1      
+  90   1      //      while(n--)
+  91   1              {
+  92   2                      rf_slave.rx_tout = 0;
+  93   2                      //rf_transceiver(RF_TRANSFER, 1,spidAck, 4, ack_tmp, sizeof(ack_tmp), &ack_len); //发送响应     
+  94   2                      rf_transceiver(RF_RECEIVER, RF_RX_TOUT, spidAck, sizeof(spidAck), ack_tmp, RF_FIFO_MAX, &ack_len);
+  95   2              }
+  96   1                      
+  97   1      }
+*** WARNING C173 IN LINE 97 OF CODE\APP\SRC\UART2USB.C: missing return-expression
+  98          
+  99          
+ 100          
+ 101          #ifdef _RF_HOST
+              
+              idata UART_RECV uart = {0};
+              idata RF_HOST rf_host = {0};
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART receive data
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 3   
+
+              void uart_receive(UINT8 dat)
+              {       
+                      uart.time_out = T_OUT_MAX;
+              
+                      switch(uart.state)
+                      {
+                              case RECV_IDLE:
+                                      if(uart.data_ok != TRUE)
+                                      {
+                                              //uart.index = 3;
+                                              uart.index_tmp = 0;
+                                              uart.state = RECV_DATA;
+                                      }
+                                      else
+                                      {
+                                              uart.state = RECV_STOP;
+                                              break;
+                                      }
+                                      
+                              case RECV_DATA:
+                                      if(uart.index_tmp >= (MAX_BUFF-3))
+                                      {
+                                              uart.state = RECV_STOP;
+                                      }
+                                      else
+                                      {
+                                              uart.buff_tmp[uart.index_tmp++] = dat;
+                                      }
+                                      break;
+                                      
+                              case RECV_STOP:
+                                      /* discard data */
+                                      break;
+              
+                              default:
+                                      uart.state = RECV_IDLE;
+                                      break;
+                      }
+              }
+              
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL rf_tx_tout(TIME_OUT mode)
+              {
+                      BOOL flag = FALSE;
+                      
+                      switch(mode)
+                      {
+                              case TX_OUT:
+                                      if(rf_host.tx_out > RF_SEND_TOUT) // tx time out
+                                      {
+                                              // tx timeout
+                                              printf("tx tout.\r\n");
+                                              flag = TRUE;
+                                      }
+                                      else
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 4   
+
+                                      {
+                                              if(rf_host.rx_init)
+                                              {
+                                                      flag = TRUE;
+                                              }
+                                      }
+                                      break;
+              
+                              case IDLE_OUT:
+                                      if(rf_host.idleout > RF_IDLE_TOUT) // idle time out
+                                      {
+                                              // goto sleep
+                                              rf_host.status = RF_PWR_OFF;
+                                              
+                                              printf("idle tout.\r\n");
+                                              flag = TRUE;
+                                      }
+                                      break;
+              
+                              case INIT_OUT:
+                                      flag = TRUE;
+                                      break;
+                                      
+                              default:
+                                      break;
+                      }
+              
+                      return flag;
+              }
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL rf_host_send(void)
+              {
+                      BOOL status = FALSE;
+                      UINT8 ack_tmp[4];
+                      UINT8 ack_len;
+                      static UINT8 pkt_id = 0;
+              
+                      /* clear tx timeout */
+                      rf_host.tx_out = 0;
+              
+                      /* packet id counter */
+                      uart.buff[1] = pkt_id & 0x7F;
+                      pkt_id++;
+              
+              RF_TRANSMIT:
+              
+                      /* rf need to send 2 packets */
+                      if(uart.index > RF_FIFO_MAX)
+                      {
+                              status = rf_transceiver(RF_TRANSFER, RF_TX_TOUT, uart.buff, RF_FIFO_MAX, \
+                                                                              ack_tmp, sizeof(ack_tmp), &ack_len);
+                                                                                                              
+                              if(status) // tx ok, no timeout
+                              {
+                      #ifdef _RF_ACK_PLD
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 5   
+
+                                      status = !memcmp(ack_tmp, rf_ack, sizeof(rf_ack));
+                          #if 1
+                          if(!status) // ack fail, re-transmit
+                          {
+                              if(rf_tx_tout(TX_OUT))
+                              {
+                                  goto RF_TRANSMIT;
+                              }
+                          }
+                          #endif /* 0 */
+                      #endif /* _RF_ACK_PLD */
+                                      
+                                      if(status) // rx ack ok
+                                      {
+                                              status = rf_transceiver(RF_TRANSFER, RF_TX_TOUT, &uart.buff[RF_FIFO_MAX], \
+                                                                                              uart.index - RF_FIFO_MAX, ack_tmp, sizeof(ack_tmp), &ack_len);
+                                      }
+                              }       
+                      }
+                      else
+                      {
+                              status = rf_transceiver(RF_TRANSFER, RF_TX_TOUT, uart.buff, uart.index, \
+                                                                              ack_tmp, sizeof(ack_tmp), &ack_len);
+                      }
+                      
+                      if(status) // tx ok, no timeout
+                      {
+                      #ifdef _RF_ACK_PLD
+                              status = !memcmp(ack_tmp, rf_ack, sizeof(rf_ack));
+                      #if 1
+                      if(!status) // ack fail, re-transmit
+                      {
+                          if(rf_tx_tout(TX_OUT))
+                          {
+                              goto RF_TRANSMIT;
+                          }
+                      }
+                      #endif /* 0 */
+                      #endif /* _RF_ACK_PLD */
+                      }
+              
+                      if(status) // rx ack ok, tx success
+                      {
+                              rf_host.idleout = 0; // clear idle cnt
+                      }
+              
+                      return status;
+              }
+              
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL check_same_code(void)
+              {
+                      BOOL flag = FALSE;
+                      
+                      if(rf_host.same_flag)
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 6   
+
+                      {
+                              UINT8 tmp;
+                              UINT8 len;
+                              UINT8 i = 0;
+                              
+                              flag = TRUE;
+                              len = uart.index - 3; // no cnt & pkt & pid
+                              
+                              at24cxx_read(LAST_DATA, &tmp, 1);
+              
+                              if(tmp != len)
+                              {
+                                      flag = FALSE;
+                                      at24cxx_write(LAST_DATA, &len, 1);
+                              }
+                              else
+                              {
+                                      /* check if time out for same code is over */
+                                      if(rf_host.same_out < rf_host.same_time)
+                                      {
+                                              for(i = 0; i < len; i++)
+                                              {
+                                                      at24cxx_read(LAST_DATA + 1 + i, &tmp, 1);
+              
+                                                      if(tmp != uart.buff[3 + i])
+                                                      {
+                                                              flag = FALSE;
+                                                              break;
+                                                      }
+                                              }
+                                      }
+                                      else
+                                      {
+                                              flag = FALSE;
+                                      }
+                              }
+                              
+                              // clear time out cnt
+                              rf_host.same_out = 0;
+              
+                              if(!flag)
+                              {
+                                      at24cxx_write(LAST_DATA + 1, (UINT8 *)&uart.buff[3], len);
+                              }
+                      }
+              
+                      return flag;
+              }
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL store_code_data(void)
+              {
+                  #define E2_VOL_1    E2_VOLUME*9/10
+                  #define E2_VOL_2    E2_VOLUME*95/100
+                  
+                      BOOL flag = TRUE;
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 7   
+
+                      UINT8 len;
+              
+                  if(rf_host.store_addr > E2_VOL_2)
+                  {
+                  #if 0
+                      watchdog_feed();
+                      PCINT1 = ON;
+                      delay_1ms(250);
+                      delay_1ms(250);
+                      PCINT1 = OFF;
+                      watchdog_feed();
+                  #else
+                      beep_ctrl(1, 500);
+                  #endif /* 0 */
+                      return FALSE;
+                  }
+                  else
+                  {
+                      if(rf_host.store_addr > E2_VOL_1)
+                      {
+                      #if 0
+                          watchdog_feed();
+                          PCINT1 = ON;
+                          delay_1ms(250);
+                          PCINT1 = OFF;
+                          watchdog_feed();
+                      #else
+                          beep_ctrl(1, 250);
+                      #endif /* 0 */
+                          //return FALSE;
+                      }
+                  }
+                  
+                      //len = uart.index - 2; // no cnt & pid
+                      len = uart.buff[0] - 2; // no cnt & pid
+                      uart.buff[2] = len; // pid -> len
+              
+                      rf_host.cur_num++;
+                      rf_host.total_num++;
+                      at24cxx_write(TOTAL_NUM, (UINT8 *)&rf_host.total_num, 2);
+                      
+                      printf("T=%d,Cur=%d\r\n", (UINT16)rf_host.total_num, (UINT16)rf_host.cur_num);
+              
+                      at24cxx_write(rf_host.store_addr, (UINT8 *)&uart.buff[2], len);
+                      
+                      rf_host.store_addr += len;
+                      at24cxx_write(STORE_ADDR, (UINT8 *)&rf_host.store_addr, 2);
+              
+                      rf_host.idleout = 0; // clear idle cnt
+                      return flag;
+              }
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              void rf_slave_init(void)
+              {
+                      UINT8 rf_pipe_bak;
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 8   
+
+                      UINT8 tx_cnt = 0;
+                      
+                      rf_pipe_bak = xn297l.pipe_index;
+                      xn297l.pipe_index = 16;
+                      rf_set_ch();
+              
+                      uart_int_disable();
+              
+                      while(1)
+                      {
+                              if(rf_host_send())
+                              {
+                                      break;
+                              }
+                              else
+                              {
+                                      if(++tx_cnt > 6)
+                                      {
+                                              tx_cnt = 0;
+                                              
+                                              if(rf_host.beep)
+                                              {
+                                                      beep_ctrl(1, 80);
+                                  delay_1ms(60);
+                                              }
+                                      }
+                              }
+              
+                              if(rf_tx_tout(IDLE_OUT))
+                              {
+                                      break;
+                              }
+              
+                              if(UART_INT_FLAG)
+                              {
+                                      //uart_rx_disable();
+                                      uart_disable();
+                                      UOR = 0;
+                                      URF = 0;
+                                      break;
+                              }
+                      }
+                      
+                      rf_host.rx_init = FALSE;
+                      xn297l.pipe_index = rf_pipe_bak;
+                      rf_set_ch();
+              
+                      uart_int_enable();
+                      uart_enable();
+              }
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL uart_to_rf(void)
+              {
+                      BOOL status = FALSE;
+                      
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 9   
+
+                      if(uart.data_ok)
+                      {
+                          //__disable_interrupt();
+                          //uart_int_disable();
+                      uart.index = uart.index_tmp;
+                          memcpy(&uart.buff[3], uart.buff_tmp, uart.index);
+                      uart.data_ok = FALSE;
+                      //__enable_interrupt();
+                      //uart_int_enable();
+              
+                      uart.index += 3;
+              
+                              /* tx total bytes */
+                              uart.buff[0] = uart.index;
+              
+                              /* tx host id number */
+                              uart.buff[2] = rf_host.pid;
+                              
+                              printf("host get data.\r\n");
+                              #if 0
+                              {
+                                      UINT8 i;
+                                      
+                                      for(i = 0; i < uart.buff[0]-3; i++)
+                                      {
+                                              //printf("-%x", (UINT16)uart.buff[i]);
+                                              uart_send_byte(uart.buff[3+i]);
+                                      }
+                                      //printf("\r\n");
+                                      //uart_send_byte(0x0a);
+                              }
+                              #endif
+                      
+                              watchdog_feed();
+              
+                              if(rf_host_cmd(uart.buff) != TRUE)
+                              {
+                                      UINT8 beep_cnt = 0;
+                                      
+                                      if(rf_host.store_flag)
+                                      {
+                                              if(check_same_code() != TRUE)
+                                              {
+                                                      /* store diff code */
+                                                      beep_cnt = 0;
+                                                      store_code_data();
+                                              }
+                                              else
+                                              {
+                                                      beep_cnt = 5;
+                                              }
+                                      }
+                                      else
+                                      {
+                                              if(check_same_code() != TRUE)
+                                              {
+                                                      if(rf_host_send() != TRUE)
+                                                      {
+                                                              /* store diff code */
+                                                              beep_cnt = 3;
+                                                              store_code_data();
+                                                      }
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 10  
+
+                                                      else
+                                                      {
+                                                              beep_cnt = 1;
+                                                      }
+                                                      
+                                                      // enable data rx
+                                  //uart.data_ok = 0;
+                                              }
+                                              else
+                                              {
+                                                      beep_cnt = 5;
+                                              }
+                                      }
+              
+                                      if(rf_host.beep)
+                                      {
+                                              beep_ctrl(beep_cnt, 80);
+                                      }
+                              }
+                              else
+                              {
+                                      if(rf_host.rx_init) // slave data
+                                      {
+                                              rf_slave_init();
+                                      }
+                              }
+              
+                              watchdog_feed();
+                              //uart.data_ok = 0;
+                      }
+                      else
+                      {
+                              //printf(".");
+                              mcu_goto_idle();
+                              rf_tx_tout(IDLE_OUT); // idle timeout
+                      }
+                      
+                      return status;
+              }
+              
+              #endif
+ 588          
+ 589          #ifdef _RF_SLAVE
+ 590          
+ 591          xdata RF_SLAVE rf_slave = {0};// _at_ 0xA8;//
+ 592          
+ 593          //------------------------------------------------------------------------
+ 594          //      Description     :       UART data to usb send
+ 595          //      Parameters      :       none
+ 596          //      Return          :       none
+ 597          //      Author          :       RAY
+ 598          //      Date            :       2014 - 03 - 11
+ 599          //------------------------------------------------------------------------
+ 600          BOOL rf_rx_tout(void)
+ 601          {
+ 602   1              if(rf_slave.rx_tout > RF_RECV_TOUT) // rx time out
+ 603   1              {
+ 604   2                      printf("rx tout.\r\n");
+ 605   2                      return TRUE;
+ 606   2              }
+ 607   1      
+ 608   1              return FALSE;
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 11  
+
+ 609   1      }
+ 610          
+ 611          //------------------------------------------------------------------------
+ 612          //      Description     :       data to usb send
+ 613          //      Parameters      :       none
+ 614          //      Return          :       none
+ 615          //      Author          :       RAY
+ 616          //      Date            :       2014 - 03 - 11
+ 617          //------------------------------------------------------------------------
+ 618          void usb_data_proc(UINT8 mode, UINT8 *data_buff)
+ 619          {
+ 620   1              if(rf_slave.pkt_id != (data_buff[1] & 0x1F))
+ 621   1              {
+ 622   2                      rf_slave.clear_t = RF_SEND_TOUT;
+ 623   2                      
+ 624   2                      if(mode != INIT_MODE)
+ 625   2                      {
+ 626   3                          UINT8 crc_l = data_buff[data_buff[0]-1];
+ 627   3                          UINT8 crc_h = data_buff[data_buff[0]-2];
+ 628   3      
+ 629   3                          UINT16 crc = calc_crc16_ccitt(&data_buff[HEAD_LEN], data_buff[0]-HEAD_LEN-2);
+ 630   3                          
+ 631   3                  if((((crc>>8) & 0xFF) == crc_h) && ((crc & 0xFF) == crc_l))
+ 632   3                  {
+ 633   4                              UINT8 language;
+ 634   4                              
+ 635   4                              rf_slave.add_type = DAT_RIGHT(data_buff[1], 5);
+ 636   4                              //language = DAT_RIGHT(data_buff[1], 6);
+ 637   4                              language = data_buff[3];
+ 638   4      
+ 639   4                      #if 0
+                                      if(language & 0x80)
+                                      {
+                                          usb_key_send(NULL, 1, language & 0x80);
+                                              
+                                              /* Wait 1600Ms */
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              delay_1ms(250);
+                                              watchdog_feed();
+                                              delay_1ms(100);
+                                      }
+                              #endif /* 0 */
+ 661   4                              
+ 662   4                              //if(rf_slave.pid_flag)
+ 663   4                              if(rf_slave.add_type)
+ 664   4                              {
+ 665   5                                      UINT8 tmp_dat[4];
+ 666   5                                      UINT8 len = 0;
+ 667   5                                      UINT8 tmp;
+ 668   5                                      UINT8 host_id = data_buff[2]; 
+ 669   5      
+ 670   5                                      tmp = host_id / 100;
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 12  
+
+ 671   5                                      if(tmp != 0)
+ 672   5                                      {
+ 673   6                                              tmp_dat[len++] = tmp + '0';
+ 674   6                                      }
+ 675   5      
+ 676   5                                      tmp = host_id % 100 / 10;
+ 677   5                                      if((len != 0) || (tmp != 0))
+ 678   5                                      {
+ 679   6                                              tmp_dat[len++] = tmp + '0';
+ 680   6                                      }
+ 681   5      
+ 682   5                                      tmp_dat[len++] = host_id % 10 + '0';
+ 683   5                                      
+ 684   5                                      switch(rf_slave.add_type)
+ 685   5                                      {
+ 686   6                                              case ADD_TAB:
+ 687   6                                                      tmp_dat[len++] = 0x09/*hid_tab*/;
+ 688   6                                                      break;
+ 689   6      
+ 690   6                                              case ADD_BLANK:
+ 691   6                                                      tmp_dat[len++] = 0x20/*hid_space*/;
+ 692   6                                                      break;
+ 693   6      
+ 694   6                                              case ADD_LINE:
+ 695   6                                                      tmp_dat[len++] = 0x2D/*hid_underline*/;
+ 696   6                                                      break;
+ 697   6      
+ 698   6                                          case ADD_NOT:
+ 699   6                                              break;
+ 700   6      
+ 701   6                                              default:
+ 702   6                                                      break;
+ 703   6                                      }
+ 704   5                                      
+ 705   5                                      watchdog_feed();
+ 706   5      
+ 707   5                                      /* send prefix for ID data */
+ 708   5                                      usb_key_send(tmp_dat, len, language & 0x7F);
+ 709   5                              }
+ 710   4      
+ 711   4                              watchdog_feed();
+ 712   4      
+ 713   4                              /* send scan data from rf host ------------------------- */
+ 714   4                              usb_key_send(&data_buff[HEAD_LEN], data_buff[0]-HEAD_LEN-2, language & 0x7F);
+ 715   4                              }
+ 716   3                              else
+ 717   3                              {
+ 718   4                                  return;
+ 719   4                              }
+ 720   3                      }
+ 721   2                      else
+ 722   2                      {
+ 723   3                              /* handle for init cmd */
+ 724   3                              //rf_slave_cmd(data_buff);
+ 725   3                      }
+ 726   2                      
+ 727   2                      rf_slave.pkt_id = data_buff[1] & 0x1F;
+ 728   2              }
+ 729   1      }
+ 730          
+ 731          //------------------------------------------------------------------------
+ 732          //      Description     :       data to usb send
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 13  
+
+ 733          //      Parameters      :       none
+ 734          //      Return          :       none
+ 735          //      Author          :       RAY
+ 736          //      Date            :       2014 - 03 - 11
+ 737          //------------------------------------------------------------------------
+ 738          void usb_data_proc1(UINT8 mode, UINT8 *data_buff)       
+ 739          {
+ 740   1      //      if(rf_slave.pkt_id != (data_buff[3] & 0x1F))
+ 741   1              {
+ 742   2                      rf_slave.clear_t = RF_SEND_TOUT;
+ 743   2                      
+ 744   2                      if(mode != INIT_MODE)
+ 745   2                      {
+ 746   3                              UINT8 language;
+ 747   3                              UINT16 total_len;
+ 748   3      
+ 749   3                              total_len = data_buff[1];
+ 750   3                              total_len <<= 8;
+ 751   3                              total_len += data_buff[2];
+ 752   3      
+ 753   3                              //if(!usb_type_cmd(&data_buff[HEAD_LEN+2], total_len-(HEAD_LEN+2)))
+ 754   3                              {
+ 755   4                              rf_slave.add_type = DAT_RIGHT(data_buff[3], 5);
+ 756   4                              language = data_buff[5];
+ 757   4      
+ 758   4      
+ 759   4                              watchdog_feed();
+ 760   4      
+ 761   4                              /* send scan data from rf host ------------------------- */
+ 762   4                              usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, language);             //-1  crc
+ 763   4                              }
+ 764   3                      }
+ 765   2              }
+ 766   1      }
+ 767          //void usb_data_proc1(UINT8 mode, UINT8 *data_buff)     
+ 768          //{
+ 769          //      if(rf_slave.pkt_id != (data_buff[3] & 0x1F))
+ 770          //      {
+ 771          //              rf_slave.clear_t = RF_SEND_TOUT;
+ 772          //              
+ 773          //              if(mode != INIT_MODE)
+ 774          //              {
+ 775          //                      UINT8 language;
+ 776          //                      UINT16 total_len;
+ 777          //
+ 778          //                      total_len = data_buff[1];
+ 779          //                      total_len <<= 8;
+ 780          //                      total_len += data_buff[2];
+ 781          //
+ 782          //                      //if(!usb_type_cmd(&data_buff[HEAD_LEN+2], total_len-(HEAD_LEN+2)))
+ 783          //                      {
+ 784          //                      rf_slave.add_type = DAT_RIGHT(data_buff[3], 5);
+ 785          //                      language = data_buff[5];
+ 786          //
+ 787          //                #if 0
+ 788          //                      if(language & 0x80)
+ 789          //                      {
+ 790          //                          usb_key_send(NULL, 1, language & 0x80);
+ 791          //                              
+ 792          //                              /* Wait 1600Ms */
+ 793          //                              delay_1ms(250);
+ 794          //                              watchdog_feed();
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 14  
+
+ 795          //                              delay_1ms(250);
+ 796          //                              watchdog_feed();
+ 797          //                              delay_1ms(250);
+ 798          //                              watchdog_feed();
+ 799          //                              delay_1ms(250);
+ 800          //                              watchdog_feed();
+ 801          //                              
+ 802          //                              delay_1ms(250);
+ 803          //                              watchdog_feed();
+ 804          //                              delay_1ms(250);
+ 805          //                              watchdog_feed();
+ 806          //                              delay_1ms(100);
+ 807          //                      }
+ 808          //                #endif /* 0 */
+ 809          //                      
+ 810          //                      //if(rf_slave.pid_flag)
+ 811          //                      if(rf_slave.add_type)
+ 812          //                      {
+ 813          //                              UINT8 tmp_dat[4];
+ 814          //                              UINT8 len = 0;
+ 815          //                              UINT8 tmp;
+ 816          //                              UINT8 host_id = data_buff[4]; 
+ 817          //
+ 818          //                              tmp = host_id / 100;
+ 819          //                              if(tmp != 0)
+ 820          //                              {
+ 821          //                                      tmp_dat[len++] = tmp + '0';
+ 822          //                              }
+ 823          //
+ 824          //                              tmp = host_id % 100 / 10;
+ 825          //                              if((len != 0) || (tmp != 0))
+ 826          //                              {
+ 827          //                                      tmp_dat[len++] = tmp + '0';
+ 828          //                              }
+ 829          //
+ 830          //                              tmp_dat[len++] = host_id % 10 + '0';
+ 831          //                              
+ 832          //                              switch(rf_slave.add_type)
+ 833          //                              {
+ 834          //                                      case ADD_TAB:
+ 835          //                                              //tmp_dat[len++] = 0x09/*hid_tab*/;
+ 836          //                                              break;
+ 837          //
+ 838          //                                      case ADD_BLANK:
+ 839          //                                              tmp_dat[len++] = 0x20/*hid_space*/;
+ 840          //                                              break;
+ 841          //
+ 842          //                                      case ADD_LINE:
+ 843          //                                              tmp_dat[len++] = 0x2D/*hid_underline*/;
+ 844          //                                              break;
+ 845          //
+ 846          //                                  case ADD_NOT:
+ 847          //                                      break;
+ 848          //
+ 849          //                                      default:
+ 850          //                                              break;
+ 851          //                              }
+ 852          //                              
+ 853          //                              watchdog_feed();
+ 854          //
+ 855          //                              /* send prefix for ID data */
+ 856          //                              usb_key_send(tmp_dat, len, language);
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 15  
+
+ 857          //                      }
+ 858          //
+ 859          //                      watchdog_feed();
+ 860          //
+ 861          //                      /* send scan data from rf host ------------------------- */
+ 862          //                      usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2), language);
+ 863          //                      }
+ 864          //              }
+ 865          //              else
+ 866          //              {
+ 867          //                      /* handle for init cmd */
+ 868          //                      //rf_slave_cmd(data_buff);
+ 869          //              }
+ 870          //              
+ 871          //              rf_slave.pkt_id = data_buff[3] & 0x1F;
+ 872          //      }
+ 873          //}
+ 874          
+ 875          #ifdef RF_250KBPS
+ 876          //------------------------------------------------------------------------
+ 877          //      Description     :       UART data to usb send
+ 878          //      Parameters      :       none
+ 879          //      Return          :       none
+ 880          //      Author          :       RAY
+ 881          //      Date            :       2014 - 03 - 11
+ 882          //------------------------------------------------------------------------
+ 883          //BOOL rf_to_usb(UINT8 mode)
+ 884          //{
+ 885          //      BOOL rx_ok;
+ 886          //      UINT8 i;
+ 887          //      UINT8 ulen;
+ 888          //      UINT8 ack_data[4];
+ 889          //      UINT8 bag_id;
+ 890          //      UINT16 total_len = 0;
+ 891          //      UINT8 *rx_index = NULL;
+ 892          //
+ 893          //      /* clear recv time out */
+ 894          //      rf_slave.rx_tout = 0;
+ 895          //
+ 896          //      for(i = 0; i < 100; i++)
+ 897          //      {
+ 898          //      RF_RECEIVE:
+ 899          //          
+ 900          //        watchdog_feed();
+ 901          //          
+ 902          //              if(mode == INIT_MODE)
+ 903          //              {
+ 904          //                      rf_get_mac(ack_data); // ack MAC to Host
+ 905          //              }
+ 906          //              else // DATA MODE
+ 907          //              {
+ 908          //                      //my_memcpy(ack_data, (code_ptr *)&rf_ack[i][0], ACK_C);
+ 909          //                      memcpy(ack_data, &rf_ack[0][0], ACK_C);
+ 910          //              }
+ 911          //
+ 912          //              rx_index = &rf_slave.buff[i*(RF_FIFO_MAX-1)];
+ 913          //              
+ 914          //              rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
+*** WARNING C329 IN LINE 914 OF code\app\src\uart2usb.c: single-line comment contains line-continuation
+ 915          //                                                         rx_index, RF_FIFO_MAX, &ulen);
+ 916          //
+ 917          //              if(rx_ok) // get RF data
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 16  
+
+ 918          //              {
+ 919          //                      //uart_send_byte(rx_index[0]);
+ 920          //                      
+ 921          //                      /* clear rx time out */
+ 922          //                      rf_slave.rx_tout = 0;
+ 923          //
+ 924          //                      /* get current data bag id */
+ 925          //                      bag_id = rx_index[0];
+ 926          //
+ 927          //                      if((bag_id >= 1) & (bag_id <= 102)) // support 102 bag
+ 928          //                      {
+ 929          //                              if(bag_id == (i + 1)) // bag id is correct
+ 930          //                              {
+ 931          //                                      memcpy(rx_index, rx_index + 1, ulen - 1); // shift left one byte
+ 932          //                                      total_len += (ulen - 1);
+ 933          //                              }
+ 934          //                      #if 1
+ 935          //                              else if(bag_id == i) // bag id to be last one
+ 936          //                              {
+ 937          //                                      // receive again
+ 938          //                                      goto RF_RECEIVE;
+ 939          //                              }
+ 940          //                      #endif /* 0 */
+ 941          //                              else // bag id is incorrect
+ 942          //                              {
+ 943          //                                      rx_ok = 0;
+ 944          //                                      break;
+ 945          //                              }
+ 946          //                      }
+ 947          //                      else // bag id is incorrect
+ 948          //                      {
+ 949          //                              rx_ok = 0;
+ 950          //                              break;
+ 951          //                      }
+ 952          //              }
+ 953          //              else
+ 954          //              {
+ 955          //                      break; // RF rx timeout
+ 956          //              }
+ 957          //
+ 958          //              if(rx_ok)
+ 959          //              {
+ 960          //                      if(mode == DATA_MODE)
+ 961          //                      {
+ 962          //                          if(rf_slave.buff[0] != 0xFF) // Old Protocol
+ 963          //                          {
+ 964          //                              if(rf_slave.buff[0] == total_len) // full data bag received
+ 965          //                              {
+ 966          //                                      //uart_send_byte(0xAA);
+ 967          //
+ 968          //                                      // last bag may need more ack
+ 969          //                                      rf_slave.rx_tout = RF_RECV_TOUT;
+ 970          //                                      rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
+ 971          //
+ 972          //                        beep_wait_over();
+ 973          //                        delay_1ms(10);
+ 974          //                        beep_enable(60);
+ 975          //
+ 976          //                              /* handle the received rf data */
+ 977          //                              usb_data_proc(mode, rf_slave.buff);                     
+ 978          //                                      break;
+ 979          //                              }
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 17  
+
+ 980          //                              }
+ 981          //                              else // New Protocol
+ 982          //                              {
+ 983          //                                  UINT16 temp_len;
+ 984          //
+ 985          //                                  temp_len = rf_slave.buff[1];
+ 986          //                                  temp_len <<= 8;
+ 987          //                                  temp_len += rf_slave.buff[2];
+ 988          //
+ 989          //                                  if(temp_len == total_len) // full data bag received
+ 990          //                                  {
+ 991          //                                      // last bag may need more ack
+ 992          //                                      rf_slave.rx_tout = RF_RECV_TOUT;
+ 993          //                                      rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
+ 994          //
+ 995          //                        beep_wait_over();
+ 996          //                        delay_1ms(10);
+ 997          //                        beep_enable(60);
+ 998          //
+ 999          //                              /* handle the received rf data */
+1000          //                              usb_data_proc1(mode, rf_slave.buff);
+1001          //                                      break;
+1002          //                                  }
+1003          //                              }
+1004          //                      }
+1005          //                      else // INIT MODE
+1006          //                      {
+1007          //                              break;
+1008          //                      }
+1009          //              }
+1010          //      }
+1011          //    
+1012          //      memset(rf_slave.buff, 0, sizeof(rf_slave.buff));
+1013          //
+1014          //      return rx_ok;
+1015          //}
+1016          static UINT8 rx_temp[RF_FIFO_MAX]={0};
+1017          
+1018          BOOL rf_to_usb(UINT8 mode)
+1019          {
+1020   1              BOOL rx_ok;
+1021   1              UINT8 i;
+1022   1              UINT8 ulen;
+1023   1              UINT8 ack_data[4];
+1024   1              UINT8 bag_id;
+1025   1              UINT16 total_len = 0;
+1026   1              UINT8 *rx_index = NULL;
+1027   1      
+1028   1              /* clear recv time out */
+1029   1              rf_slave.rx_tout = 0;
+1030   1      
+1031   1              for(i = 0; i < 100; i++)
+1032   1              {
+1033   2              RF_RECEIVE:
+1034   2                  
+1035   2              watchdog_feed();
+1036   2                  
+1037   2                      if(mode == INIT_MODE)
+1038   2                      {
+1039   3                              rf_get_mac(ack_data); // ack MAC to Host
+1040   3                      }
+1041   2                      else // DATA MODE
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 18  
+
+1042   2                      {
+1043   3                              //my_memcpy(ack_data, (code_ptr *)&rf_ack[i][0], ACK_C);
+1044   3                              memcpy(ack_data, &rf_ack[0][0], ACK_C);
+1045   3                      }
+1046   2      
+1047   2                      if(0 != i)      //非第一组
+1048   2                      {
+1049   3                              rx_index = &rf_slave.buff[i*(RF_FIFO_MAX-1)];
+1050   3                      }
+1051   2                      else            //第一组数据
+1052   2                      {
+1053   3                              rx_index = rx_temp;
+1054   3                      }
+1055   2                      
+1056   2                      //接收
+1057   2                      rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
+1058   2                                                                 rx_index, RF_FIFO_MAX, &ulen);
+1059   2      
+1060   2                      if(rx_ok) // get RF data
+1061   2                      {
+1062   3                              /* clear rx time out */
+1063   3                              rf_slave.rx_tout = 0;
+1064   3      
+1065   3                              /* get current data bag id */
+1066   3                              bag_id = rx_index[0];
+1067   3      
+1068   3                              if((bag_id >= 1) & (bag_id <= 102)) // support 102 bag
+1069   3                              {
+1070   4                                      if(bag_id == (i + 1)) // bag id is correct
+1071   4                                      {
+1072   5                                              memcpy(rx_index, rx_index + 1, ulen - 1); // shift left one byte                 //左移1字节
+1073   5                                              total_len += (ulen - 1);
+1074   5      
+1075   5      
+1076   5      
+1077   5      
+1078   5      /*添加命令包*/
+1079   5      //                                      if(isCmdPkt(rx_index+6, ulen - 7))      //是命令包
+1080   5      //                                      {
+1081   5      //                                              if(((CMD_UPLOAD*)(rx_index+6))->sid == rf_slave.pkt_id)
+1082   5      //                                              {
+1083   5      //                                                      usb_data_proc1(mode, rf_slave.buff);    //usb上传 
+1084   5      //                                                      rf_slave.pkt_id = INIT_ID; //clear pid
+1085   5      //                                              }
+1086   5      //                                              break;
+1087   5      //                                      }
+1088   5      /**/                                    
+1089   5      
+1090   5      
+1091   5      
+1092   5      
+1093   5      
+1094   5      
+1095   5                                              if(1==bag_id)
+1096   5                                              {
+1097   6                                                      if(rx_index[4] == rf_slave.pkt_id)      //spid == pid
+1098   6                                                      {
+1099   7                                                              usb_data_proc1(mode, rf_slave.buff);    //usb上传       
+1100   7                                                              rf_slave.pkt_id = INIT_ID; //clear pid
+1101   7                                                      }
+1102   6                                                      memcpy(&rf_slave.buff[0], rx_index, ulen - 1);  //将数据写入rf_slave.buff
+1103   6                                              }
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 19  
+
+1104   5                                      }
+1105   4                              #if 1
+1106   4                                      else if(bag_id == i) // bag id to be last one
+1107   4                                      {
+1108   5                                              // receive again
+1109   5                                              goto RF_RECEIVE;
+1110   5                                      }
+1111   4                              #endif /* 0 */
+1112   4                                      else // bag id is incorrect
+1113   4                                      {
+1114   5                                              rx_ok = 0;
+1115   5                                              break;
+1116   5                                      }
+1117   4                              }
+1118   3                              else // bag id is incorrect
+1119   3                              {
+1120   4                                      rx_ok = 0;
+1121   4                                      break;
+1122   4                              }
+1123   3                      }
+1124   2                      else
+1125   2                      {
+1126   3                              break; // RF rx timeout
+1127   3                      }
+1128   2      
+1129   2                      if(rx_ok)
+1130   2                      {
+1131   3                              if(mode == DATA_MODE)
+1132   3                              {
+1133   4                                      if(rf_slave.buff[0] == 0xFF)
+1134   4                                      {
+1135   5                                          UINT16 temp_len;
+1136   5      
+1137   5                                          temp_len = rf_slave.buff[1];
+1138   5                                          temp_len <<= 8;
+1139   5                                          temp_len += rf_slave.buff[2];
+1140   5      
+1141   5                                          if(temp_len == total_len) // full data bag received
+1142   5                                          {
+1143   6                                              // last bag may need more ack
+1144   6      //                                      rf_slave.rx_tout = RF_RECV_TOUT;
+1145   6      //                                      rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
+1146   6      
+1147   6      //                        beep_wait_over();
+1148   6      //                        delay_1ms(500);               //10
+1149   6      //                        beep_enable(60);
+1150   6      
+1151   6                                      /* handle the received rf data */
+1152   6                                                      //crc校验
+1153   6                                                      //记录spid
+1154   6                                                      //返回spid
+1155   6      
+1156   6                                                      if(checkData(&rf_slave.buff[0],temp_len))
+1157   6                                                      {
+1158   7                                                              rf_slave.pkt_id = (rf_slave.buff[3] & 0x1F);    //记录rf_slave.pkt_id 
+1159   7                                                              ReceiveCompleteAck(rf_slave.pkt_id);
+1160   7                                                      }               
+1161   6                                                      
+1162   6                                              break;
+1163   6                                          }
+1164   5                                      }
+1165   4                              }
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 20  
+
+1166   3                              else // INIT MODE
+1167   3                              {
+1168   4                                      break;
+1169   4                              }
+1170   3                      }
+1171   2              }
+1172   1          
+1173   1              //memset(rf_slave.buff, 0, sizeof(rf_slave.buff));
+1174   1      
+1175   1              return rx_ok;
+1176   1      }
+1177          #else
+              
+              //------------------------------------------------------------------------
+              //      Description     :       UART data to usb send
+              //      Parameters      :       none
+              //      Return          :       none
+              //      Author          :       RAY
+              //      Date            :       2014 - 03 - 11
+              //------------------------------------------------------------------------
+              BOOL rf_to_usb(UINT8 mode)
+              {
+                      UINT8 ulen1 = 0, ulen2 = 0;
+                      BOOL rx_ok;
+                      //UINT8 ack_data[4] = {STX, 0x01, 0xFE, ETX};
+                      UINT8 ack_data[4];
+              
+                      if(mode == INIT_MODE)
+                      {
+                              rf_get_mac(ack_data); // ack MAC to Host
+                      }
+                      else // DATA MODE
+                      {
+                              //my_memcpy(ack_data, (code_ptr *)rf_ack, 4);
+                              my_memcpy(ack_data, (code_ptr *)&rf_ack[0][0], ACK_C);
+                      }
+              
+                      /* clear recv time out */
+                      rf_slave.rx_tout = 0;
+              
+                      rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
+                                                                      rf_slave.buff, RF_FIFO_MAX, &ulen1);
+              
+                      if(rx_ok && ulen1)
+                      {
+                      #if 0
+                              UINT8 i;
+                              watchdog_feed();
+                              
+                              printf("1st pkt :\r\n");
+                              
+                              for(i = 0; i < /*ulen1*/rf_slave.buff[0]-3; i++)
+                              {
+                                      printf("+%x", (UINT16)rf_slave.buff[i]);
+                                      uart_send_byte(rf_slave.buff[3+i]);
+                              }
+                              uart_send_byte(0x0a);
+                              printf("\r\n");
+                      #endif
+              
+                              if((ulen1 == sizeof(ack_data)) && \
+                              (!memcmp(ack_data, rf_slave.buff, ulen1)))
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 21  
+
+                              {
+                                      // idle or ping pkt
+                                      rx_ok = 0;
+                              }
+                              else
+                              {
+                                      /* data length is in valid range of the buffer -------------*/
+                                      if((rf_slave.buff[0] > RF_FIFO_MAX) && (rf_slave.buff[0] <= MAX_BUFF))
+                                      {
+                                              /* may be last 2nd pkt or error pkt */
+                                              if(ulen1 != RF_FIFO_MAX)
+                                              {
+                                                      rx_ok = 0;
+                                              }
+                                              else
+                                              {
+                                                      UINT8 retry = 0;
+              
+                                                      //printf("2nd pkt :\r\n");
+                                                      
+                                                      /* clear recv time out */
+                                                      rf_slave.rx_tout = 0;//RF_RECV_TOUT - 1000; // 1s left
+                                                      
+                                              RETRY_RX:       
+                                                      rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
+                                                                                                      &rf_slave.buff[RF_FIFO_MAX], MAX_BUFF - RF_FIFO_MAX, &ulen2);
+              
+                                                      if(rx_ok && ulen2)
+                                                      {
+                                                      #if 0
+                                                              watchdog_feed();
+                                                              
+                                                              for(i = 0; i < ulen2; i++)
+                                                              {
+                                                                      printf("-%x", (UINT16)rf_slave.buff[ulen1+i]);
+                                                              }
+                                                              printf("\r\n");
+                                                      #endif
+                                                      
+                                                              if((ulen2 == sizeof(ack_data)) && \
+                                                              (!memcmp(ack_data, &rf_slave.buff[RF_FIFO_MAX], ulen2)))
+                                                              {
+                                                                      // idle or ping pkt
+                                                                      rx_ok = 0;
+                                                              }
+                                                              else
+                                                              {
+                                                                      if(rf_slave.buff[0] != (ulen1 + ulen2) && \
+                                                                      (!memcmp(rf_slave.buff, &rf_slave.buff[ulen1], ulen2)))
+                                                                      {
+                                                                              /* may be the 1st pkt */
+                                                                              if(++retry < 3)
+                                                                              {
+                                                                                      ulen2 = 0;
+                                                                                      goto RETRY_RX;
+                                                                              }
+                                                                              else
+                                                                              {
+                                                                                      rx_ok = 0;
+                                                                              }
+                                                                      }
+                                                              }
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 22  
+
+                                                      }
+                                                      else
+                                                      {
+                                                              rx_ok = 0;
+                                                      }
+                                              }
+                                      }
+                                      else
+                                      {
+                                              /* may be last 2nd pkt or error pkt */
+                                              if(rf_slave.buff[0] != ulen1)
+                                              {
+                                                      rx_ok = 0;
+                                              }
+                                              else
+                                              {
+                                                      // need to do:
+                                              }
+                                      }
+                                      
+                                      if(rx_ok && (ulen1 || ulen2))
+                                      {
+                                      #if 0
+                                              UINT8 i;
+                                              watchdog_feed();
+                                              
+                                              printf("send key.\r\n");
+                                              
+                                              for(i = 0; i < rf_slave.buff[0]; i++)
+                                              {
+                                                      printf("%x, ", (UINT16)rf_slave.buff[i]);
+                                              }
+                                              printf("\r\n");
+                                      #endif
+                              
+                              PCINT1 = ON; // led on
+              
+                                      /* handle the received rf data */
+                                      usb_data_proc(mode, rf_slave.buff);
+                                      
+                              PCINT1 = OFF; // led off
+                          }
+                      }
+                      
+                              memset(rf_slave.buff, 0, sizeof(rf_slave.buff));
+                      }
+              
+                      return rx_ok;
+              }
+              #endif /* RF_250KBPS */
+1340          
+1341          //------------------------------------------------------------------------
+1342          //      Description     :       UART data to usb send
+1343          //      Parameters      :       none
+1344          //      Return          :       none
+1345          //      Author          :       RAY
+1346          //      Date            :       2014 - 03 - 11
+1347          //------------------------------------------------------------------------
+1348          void rf_slave_config(void)
+1349          {
+1350   1              UINT8 init_mac[4] = {MAC0, MAC1, MAC2, MAC3};
+1351   1              
+C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 23  
+
+1352   1              rf_set_pipe(PIPE_INDEX_MAX);
+1353   1              rf_set_ch();
+1354   1              rf_set_mac(init_mac);
+1355   1      
+1356   1              rf_to_usb(INIT_MODE);
+1357   1              rf_to_usb(INIT_MODE);
+1358   1              rf_to_usb(INIT_MODE);
+1359   1              
+1360   1              rf_set_pipe((xn297l.mac[3] + 1) % PIPE_INDEX_MAX);
+1361   1              rf_set_ch();
+1362   1              rf_set_mac(xn297l.mac);
+1363   1      }
+1364          
+1365          //------------------------------------------------------------------------
+1366          //      Description     :       UART data to usb send
+1367          //      Parameters      :       none
+1368          //      Return          :       none
+1369          //      Author          :       Sycreader
+1370          //      Date            :       2014 - 03 - 11
+1371          //------------------------------------------------------------------------
+1372          void rf_slave_update(void)
+1373          {
+1374   1          #define _IAP_ADDR   0x0000 // Bootloader
+1375   1          #define _FLAG_ADDR  (5*1024 + 512)
+1376   1          
+1377   1          UINT8 goto_flag[4] = {0xAA, 0xBB, 0xCC, 0xDD};
+1378   1          
+1379   1          Flash_PageErase(_FLAG_ADDR);
+1380   1          Flash_Write(_FLAG_ADDR, goto_flag, 4);
+1381   1          
+1382   1          // Disable All Interrupt. 
+1383   1          _sfrb_bank0();
+1384   1          IE0 = 0;
+1385   1          IE1 = 0;
+1386   1          IE2 = 0;
+1387   1          IE3 = 0;
+1388   1      
+1389   1          // Goto Iap Start ADDR.
+1390   1          ((void (code *)(void))_IAP_ADDR)();
+1391   1      }
+1392          
+1393          #endif
+1394          
+1395          #endif /* _UART2USB */
+1396          
+*** WARNING C290 IN LINE 97 OF CODE\APP\SRC\UART2USB.C: missing return value
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1653    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   1630      61
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  5 WARNING(S),  0 ERROR(S)
