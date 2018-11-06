@@ -743,7 +743,6 @@ void usb_data_proc1(UINT8 mode, UINT8 *data_buff)
 		
 		if(mode != INIT_MODE)
 		{
-			UINT8 language;
 			UINT16 total_len;
 
 			total_len = data_buff[1];
@@ -752,14 +751,10 @@ void usb_data_proc1(UINT8 mode, UINT8 *data_buff)
 
 			//if(!usb_type_cmd(&data_buff[HEAD_LEN+2], total_len-(HEAD_LEN+2)))
 			{
-    			rf_slave.add_type = DAT_RIGHT(data_buff[3], 5);
-    			language = data_buff[5];
-
-
     			watchdog_feed();
 
     			/* send scan data from rf host ------------------------- */
-    			usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, language);		//-1  crc
+    			usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, 2);		//-1  crc
 			}
 		}
 	}
@@ -1094,12 +1089,21 @@ BOOL rf_to_usb(UINT8 mode)
 
 					if(1==bag_id)
 					{
-						if(rx_index[4] == rf_slave.pkt_id)	//spid == pid
+						//crc
+						if(rx_index[0] == crc_high_first(&rx_index[1], ulen - 1 - 1))	//ulen-bagid-crc
 						{
-							usb_data_proc1(mode, rf_slave.buff);	//usb上传	
-							rf_slave.pkt_id = INIT_ID; //clear pid
+							if(rx_index[4] == rf_slave.pkt_id)	//spid == pid
+							{
+								usb_data_proc1(mode, rf_slave.buff);	//usb上传	
+								rf_slave.pkt_id = INIT_ID; //clear pid
+							}
+							memcpy(&rf_slave.buff[0], rx_index, ulen - 1);	//将数据写入rf_slave.buff
 						}
-						memcpy(&rf_slave.buff[0], rx_index, ulen - 1);	//将数据写入rf_slave.buff
+						else	//如果crc错误，退出
+						{
+							return;
+						}
+
 					}
 				}
 			#if 1
@@ -1130,7 +1134,7 @@ BOOL rf_to_usb(UINT8 mode)
 		{
 			if(mode == DATA_MODE)
 			{
-				if(rf_slave.buff[0] == 0xFF)
+				//if(rf_slave.buff[0] == 0xFF)
 				{
 				    UINT16 temp_len;
 
@@ -1163,10 +1167,7 @@ BOOL rf_to_usb(UINT8 mode)
 				    }
 				}
 			}
-			else // INIT MODE
-			{
-				break;
-			}
+
 		}
 	}
     

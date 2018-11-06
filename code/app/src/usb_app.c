@@ -199,7 +199,6 @@ BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
 	UINT8 dat_buff[8] = {0};
 	UINT8 index;
 	UINT8 tmp;
-	UINT8 speed;
 	
     while(length--)
     {
@@ -271,17 +270,16 @@ BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
 
 		
 
-        speed = (type >> 6) & 0x03;
 
         /* USB Key Send */
 		Ep1_Send(dat_buff, 8);
-        usb_speed_set(speed);
+        usb_speed_set(type);
         
         /* USB key Clear */
 		dat_buff[0] = 0;
 		dat_buff[2] = 0;
 		Ep1_Send(dat_buff, 8);
-		usb_speed_set(speed);
+		usb_speed_set(type);
     }
 
     return TRUE;

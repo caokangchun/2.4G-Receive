@@ -17,12 +17,7 @@
 
    UINT8 xxx[]=	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\r";
 
-//BOOL ReceiveCompleteAck(void)
-//{
-//	UINT8 ack_tmp[4],ack_len;
-//
-//	rf_transceiver(RF_TRANSFER, RF_TX_TOUT,"1234", 4, ack_tmp, sizeof(ack_tmp), &ack_len);
-//}
+
 
 
 int main(void)
@@ -94,8 +89,8 @@ int main(void)
 				rf_to_usb(DATA_MODE);
 
 			   /*≤‚ ‘*/
-//					usb_key_send(xxx,sizeof(xxx),0);
-//					delay_1ms(500);
+//					usb_key_send(xxx,sizeof(xxx),2);
+//					delay_1ms(800);
 
 
 //					ReceiveCompleteAck();
