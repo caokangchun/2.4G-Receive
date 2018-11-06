@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   DRV_TIMER                                                             11/05/2018 10:27:16 PAGE 1   
+C51 COMPILER V9.01   DRV_TIMER                                                             11/06/2018 09:43:00 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE DRV_TIMER
@@ -62,7 +62,7 @@ line level    source
   51   1              T1PR1 = temp16 / 256;
   52   1              T1PR0 = temp16 % 256;
   53   1      
-C51 COMPILER V9.01   DRV_TIMER                                                             11/05/2018 10:27:16 PAGE 2   
+C51 COMPILER V9.01   DRV_TIMER                                                             11/06/2018 09:43:00 PAGE 2   
 
   54   1              /* T1 control */
   55   1              T1CON = (0 << 7) | // TOV flag

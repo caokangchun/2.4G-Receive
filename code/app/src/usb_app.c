@@ -212,18 +212,13 @@ BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
         
         watchdog_feed();
 
-        {
-            UINT8 lang;
+        
+//            UINT8 lang;
             //LANG lang_p;
             
 	        index = *send_buff++;
 
-        #if 0
-            if(index > 0x7F)//0xC0) // out of range
-            {
-                continue;
-            }
-        #else
+
             if(index == 0xFF) // gbk head sign
             {
                 if(length >= 2)
@@ -243,57 +238,38 @@ BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
                     return FALSE;
                 }
             }
-        #endif /* 0 */
 
-            if(index < 0x20)
-            {
-                lang = 0;
-            }
-            else
-			{
-                lang = type & 0x0F;
-                if(lang > 9) // 0 ~ 6
-                {
-                    lang = 0;
-                }
-				
-				if(lang != 0)
-                {
-                    index -= 0x20;
-                }
-			}
+
+//            if(index < 0x20)
+//            {
+//                lang = 0;
+//            }
+//            else
+//			{
+//                lang = type & 0x0F;
+//                if(lang > 9) // 0 ~ 6
+//                {
+//                    lang = 0;
+//                }
+//				
+//				if(lang != 0)
+//                {
+//                    index -= 0x20;
+//                }
+//			}
 
 			//language(lang, index, &lang_p);
             //tmp = lang_p.hid;
-            tmp = (lang_ptr[lang])[index].hid;
+            tmp = (lang_ptr[0])[index].hid;
             
             if(tmp == 0x00)
                 continue;
                 
             dat_buff[2] = tmp;
-            dat_buff[0] = (lang_ptr[lang])[index].func;
+            dat_buff[0] = (lang_ptr[0])[index].func;
             //dat_buff[0] = lang_p.func;
 
-            #if 0
-	    	if(caps_lock) // CAPS status ON
-	    	{
-				if(dat_buff[0] == 0x20)
-				{
-	        		if((index >= 'A') && (index <= 'Z'))
-	        		{
-	        			dat_buff[0] = 0; // no SHIFT for Upper
-	        		}
-	    		}
-	    		else if(dat_buff[0] == 0)
-	    		{
-	        		if((index >= 'a') && (index <= 'z'))
-	        		{
-	        			dat_buff[0] = 0x20; // need SHIFT for Lower
-	        		}
-	    		}
-	    	}
-            #endif /* 0 */
-		}
+		
 
         speed = (type >> 6) & 0x03;
 

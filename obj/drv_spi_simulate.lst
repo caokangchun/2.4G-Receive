@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/05/2018 10:27:16 PAGE 1   
+C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/06/2018 09:43:00 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE DRV_SPI_SIMULATE
@@ -62,7 +62,7 @@ line level    source
   51   2      
   52   2                      dat <<= 1;                      // next bit
   53   2              _sfrb_bank1();
-C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/05/2018 10:27:16 PAGE 2   
+C51 COMPILER V9.01   DRV_SPI_SIMULATE                                                      11/06/2018 09:43:00 PAGE 2   
 
   54   2                      if(SPI_DI_PIN)          // sample bit
   55   2                              dat |= 0x01;

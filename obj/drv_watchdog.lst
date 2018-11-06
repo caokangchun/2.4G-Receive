@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/05/2018 10:27:16 PAGE 1   
+C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/06/2018 09:55:26 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE DRV_WATCHDOG
@@ -62,7 +62,7 @@ line level    source
   51   1              
   52   1              /* Write protect Key first */
   53   1              WDTCNT = WDT_KEY;
-C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/05/2018 10:27:16 PAGE 2   
+C51 COMPILER V9.01   DRV_WATCHDOG                                                          11/06/2018 09:55:26 PAGE 2   
 
   54   1              
   55   1              /* Clear WDT CNT */

@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 1   
+C51 COMPILER V9.01   MAIN                                                                  11/06/2018 09:42:57 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
@@ -62,7 +62,7 @@ line level    source
   51   1      #ifdef RF_CARRIER
                   RF_Carrier(0);
                   //rf_host.status = RF_OFFLINE;
-C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 2   
+C51 COMPILER V9.01   MAIN                                                                  11/06/2018 09:42:57 PAGE 2   
 
               #endif /* RF_CARRIER */
   55   1      
@@ -126,7 +126,7 @@ line level    source
  113   3                              //if(usb_connected())
  114   3                              rf_slave.status = RF_CONFIG;
  115   3                                  break;
-C51 COMPILER V9.01   MAIN                                                                  11/05/2018 10:27:15 PAGE 3   
+C51 COMPILER V9.01   MAIN                                                                  11/06/2018 09:42:57 PAGE 3   
 
  116   3                                      
  117   3                              case RF_UPD_S:

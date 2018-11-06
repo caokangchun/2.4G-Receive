@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 1   
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE USB_APP
@@ -62,7 +62,7 @@ line level    source
   51          *       Parameters      :       err_type -> error type
   52          *       Return          :       None
   53          *       Author          :       Sycreader
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 2   
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 2   
 
   54          *       Date            :       2013 - 10 - 28
   55          ***************************************************************************/
@@ -126,7 +126,7 @@ line level    source
  113   2                      usb_ret_status(STATUS_OK, SET_OK);
  114   2                      break;
  115   2                      
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 3   
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 3   
 
  116   2                      default:
  117   2                              usb_ret_status(STATUS_ERR, CMD_ERR); // error cmd
@@ -190,7 +190,7 @@ line level    source
  175   3                  key[i] = hid_nk_0;
  176   3              }
  177   2              else
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 4   
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 4   
 
  178   2              {
  179   3                  key[i] = key[i]-1+hid_nk_1;
@@ -229,128 +229,104 @@ line level    source
  212   2              
  213   2              watchdog_feed();
  214   2      
- 215   2              {
- 216   3                  UINT8 lang;
- 217   3                  //LANG lang_p;
- 218   3                  
- 219   3                      index = *send_buff++;
- 220   3      
- 221   3              #if 0
-                          if(index > 0x7F)//0xC0) // out of range
-                          {
-                              continue;
-                          }
-                      #else
- 227   3                  if(index == 0xFF) // gbk head sign
- 228   3                  {
- 229   4                      if(length >= 2)
- 230   4                      {
- 231   5                          UINT16 gbk;
- 232   5                          
- 233   5                          gbk = *send_buff++;
- 234   5                          gbk <<= 8;
- 235   5                          gbk += *send_buff++;
- 236   5                          length -=2;
- 237   5                          
- 238   5                          usb_gbk_input(gbk);
- 239   5                          continue;
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 5   
+ 215   2              
+ 216   2      //            UINT8 lang;
+ 217   2                  //LANG lang_p;
+ 218   2                  
+ 219   2                      index = *send_buff++;
+ 220   2      
+ 221   2      
+ 222   2                  if(index == 0xFF) // gbk head sign
+ 223   2                  {
+ 224   3                      if(length >= 2)
+ 225   3                      {
+ 226   4                          UINT16 gbk;
+ 227   4                          
+ 228   4                          gbk = *send_buff++;
+ 229   4                          gbk <<= 8;
+ 230   4                          gbk += *send_buff++;
+ 231   4                          length -=2;
+ 232   4                          
+ 233   4                          usb_gbk_input(gbk);
+ 234   4                          continue;
+ 235   4                      }
+ 236   3                      else // not valid len
+ 237   3                      {
+ 238   4                          return FALSE;
+ 239   4                      }
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 5   
 
- 240   5                      }
- 241   4                      else // not valid len
- 242   4                      {
- 243   5                          return FALSE;
- 244   5                      }
- 245   4                  }
- 246   3              #endif /* 0 */
- 247   3      
- 248   3                  if(index < 0x20)
- 249   3                  {
- 250   4                      lang = 0;
- 251   4                  }
- 252   3                  else
- 253   3                              {
- 254   4                      lang = type & 0x0F;
- 255   4                      if(lang > 9) // 0 ~ 6
- 256   4                      {
- 257   5                          lang = 0;
- 258   5                      }
- 259   4                                      
- 260   4                                      if(lang != 0)
- 261   4                      {
- 262   5                          index -= 0x20;
- 263   5                      }
- 264   4                              }
- 265   3      
- 266   3                              //language(lang, index, &lang_p);
- 267   3                  //tmp = lang_p.hid;
- 268   3                  tmp = (lang_ptr[lang])[index].hid;
- 269   3                  
- 270   3                  if(tmp == 0x00)
- 271   3                      continue;
- 272   3                      
- 273   3                  dat_buff[2] = tmp;
- 274   3                  dat_buff[0] = (lang_ptr[lang])[index].func;
- 275   3                  //dat_buff[0] = lang_p.func;
- 276   3      
- 277   3                  #if 0
-                              if(caps_lock) // CAPS status ON
-                              {
-                                              if(dat_buff[0] == 0x20)
-                                              {
-                                              if((index >= 'A') && (index <= 'Z'))
-                                              {
-                                                      dat_buff[0] = 0; // no SHIFT for Upper
-                                              }
-                                      }
-                                      else if(dat_buff[0] == 0)
-                                      {
-                                              if((index >= 'a') && (index <= 'z'))
-                                              {
-                                                      dat_buff[0] = 0x20; // need SHIFT for Lower
-                                              }
-                                      }
-                              }
-                          #endif /* 0 */
- 296   3                      }
- 297   2      
- 298   2              speed = (type >> 6) & 0x03;
- 299   2      
- 300   2              /* USB Key Send */
- 301   2                      Ep1_Send(dat_buff, 8);
-C51 COMPILER V9.01   USB_APP                                                               11/05/2018 10:27:15 PAGE 6   
+ 240   3                  }
+ 241   2      
+ 242   2      
+ 243   2      //            if(index < 0x20)
+ 244   2      //            {
+ 245   2      //                lang = 0;
+ 246   2      //            }
+ 247   2      //            else
+ 248   2      //                      {
+ 249   2      //                lang = type & 0x0F;
+ 250   2      //                if(lang > 9) // 0 ~ 6
+ 251   2      //                {
+ 252   2      //                    lang = 0;
+ 253   2      //                }
+ 254   2      //                              
+ 255   2      //                              if(lang != 0)
+ 256   2      //                {
+ 257   2      //                    index -= 0x20;
+ 258   2      //                }
+ 259   2      //                      }
+ 260   2      
+ 261   2                              //language(lang, index, &lang_p);
+ 262   2                  //tmp = lang_p.hid;
+ 263   2                  tmp = (lang_ptr[0])[index].hid;
+ 264   2                  
+ 265   2                  if(tmp == 0x00)
+ 266   2                      continue;
+ 267   2                      
+ 268   2                  dat_buff[2] = tmp;
+ 269   2                  dat_buff[0] = (lang_ptr[0])[index].func;
+ 270   2                  //dat_buff[0] = lang_p.func;
+ 271   2      
+ 272   2                      
+ 273   2      
+ 274   2              speed = (type >> 6) & 0x03;
+ 275   2      
+ 276   2              /* USB Key Send */
+ 277   2                      Ep1_Send(dat_buff, 8);
+ 278   2              usb_speed_set(speed);
+ 279   2              
+ 280   2              /* USB key Clear */
+ 281   2                      dat_buff[0] = 0;
+ 282   2                      dat_buff[2] = 0;
+ 283   2                      Ep1_Send(dat_buff, 8);
+ 284   2                      usb_speed_set(speed);
+ 285   2          }
+ 286   1      
+ 287   1          return TRUE;
+ 288   1      }
+ 289          #endif /* _USB_TX */
+ 290          
+ 291          void usb_int_disable(void)
+ 292          {
+ 293   1          _sfrb_bank0();
+ 294   1          IE2 &= ~ 0x03;
+ 295   1      }
+ 296          
+ 297          void usb_int_enable(void)
+ 298          {
+ 299   1          _sfrb_bank0();
+ 300   1          IE2 |= 0x03;
+ 301   1      }
+C51 COMPILER V9.01   USB_APP                                                               11/06/2018 10:43:37 PAGE 6   
 
- 302   2              usb_speed_set(speed);
- 303   2              
- 304   2              /* USB key Clear */
- 305   2                      dat_buff[0] = 0;
- 306   2                      dat_buff[2] = 0;
- 307   2                      Ep1_Send(dat_buff, 8);
- 308   2                      usb_speed_set(speed);
- 309   2          }
- 310   1      
- 311   1          return TRUE;
- 312   1      }
- 313          #endif /* _USB_TX */
- 314          
- 315          void usb_int_disable(void)
- 316          {
- 317   1          _sfrb_bank0();
- 318   1          IE2 &= ~ 0x03;
- 319   1      }
- 320          
- 321          void usb_int_enable(void)
- 322          {
- 323   1          _sfrb_bank0();
- 324   1          IE2 |= 0x03;
- 325   1      }
- 326          
+ 302          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    992    ----
+   CODE SIZE        =    916    ----
    CONSTANT SIZE    =      8    ----
-   XDATA SIZE       =   ----      31
+   XDATA SIZE       =   ----      30
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

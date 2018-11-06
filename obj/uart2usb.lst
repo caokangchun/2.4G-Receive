@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 1   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE UART2USB
@@ -62,7 +62,7 @@ line level    source
   51   1              if((cmdPtr->prefix1 != 0xfe) || (cmdPtr->prefix2 != 0xef))
   52   1              {
   53   2                      return FALSE;
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 2   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 2   
 
   54   2              }
   55   1      
@@ -126,7 +126,7 @@ line level    source
               //      Author          :       RAY
               //      Date            :       2014 - 03 - 11
               //------------------------------------------------------------------------
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 3   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 3   
 
               void uart_receive(UINT8 dat)
               {       
@@ -190,7 +190,7 @@ line level    source
                                               flag = TRUE;
                                       }
                                       else
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 4   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 4   
 
                                       {
                                               if(rf_host.rx_init)
@@ -254,7 +254,7 @@ line level    source
                               if(status) // tx ok, no timeout
                               {
                       #ifdef _RF_ACK_PLD
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 5   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 5   
 
                                       status = !memcmp(ack_tmp, rf_ack, sizeof(rf_ack));
                           #if 1
@@ -318,7 +318,7 @@ line level    source
                       BOOL flag = FALSE;
                       
                       if(rf_host.same_flag)
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 6   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 6   
 
                       {
                               UINT8 tmp;
@@ -382,7 +382,7 @@ line level    source
                   #define E2_VOL_2    E2_VOLUME*95/100
                   
                       BOOL flag = TRUE;
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 7   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 7   
 
                       UINT8 len;
               
@@ -446,7 +446,7 @@ line level    source
               void rf_slave_init(void)
               {
                       UINT8 rf_pipe_bak;
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 8   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 8   
 
                       UINT8 tx_cnt = 0;
                       
@@ -510,7 +510,7 @@ line level    source
               {
                       BOOL status = FALSE;
                       
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 9   
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 9   
 
                       if(uart.data_ok)
                       {
@@ -574,7 +574,7 @@ line level    source
                                                               beep_cnt = 3;
                                                               store_code_data();
                                                       }
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 10  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 10  
 
                                                       else
                                                       {
@@ -638,7 +638,7 @@ line level    source
  606   2              }
  607   1      
  608   1              return FALSE;
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 11  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 11  
 
  609   1      }
  610          
@@ -702,7 +702,7 @@ line level    source
  668   5                                      UINT8 host_id = data_buff[2]; 
  669   5      
  670   5                                      tmp = host_id / 100;
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 12  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 12  
 
  671   5                                      if(tmp != 0)
  672   5                                      {
@@ -766,7 +766,7 @@ line level    source
  730          
  731          //------------------------------------------------------------------------
  732          //      Description     :       data to usb send
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 13  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 13  
 
  733          //      Parameters      :       none
  734          //      Return          :       none
@@ -830,7 +830,7 @@ line level    source
  792          //                              /* Wait 1600Ms */
  793          //                              delay_1ms(250);
  794          //                              watchdog_feed();
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 14  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 14  
 
  795          //                              delay_1ms(250);
  796          //                              watchdog_feed();
@@ -894,7 +894,7 @@ line level    source
  854          //
  855          //                              /* send prefix for ID data */
  856          //                              usb_key_send(tmp_dat, len, language);
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 15  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 15  
 
  857          //                      }
  858          //
@@ -958,7 +958,7 @@ line level    source
  915          //                                                         rx_index, RF_FIFO_MAX, &ulen);
  916          //
  917          //              if(rx_ok) // get RF data
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 16  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 16  
 
  918          //              {
  919          //                      //uart_send_byte(rx_index[0]);
@@ -1022,7 +1022,7 @@ line level    source
  977          //                              usb_data_proc(mode, rf_slave.buff);                     
  978          //                                      break;
  979          //                              }
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 17  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 17  
 
  980          //                              }
  981          //                              else // New Protocol
@@ -1086,7 +1086,7 @@ line level    source
 1039   3                              rf_get_mac(ack_data); // ack MAC to Host
 1040   3                      }
 1041   2                      else // DATA MODE
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 18  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 18  
 
 1042   2                      {
 1043   3                              //my_memcpy(ack_data, (code_ptr *)&rf_ack[i][0], ACK_C);
@@ -1150,7 +1150,7 @@ line level    source
 1101   7                                                      }
 1102   6                                                      memcpy(&rf_slave.buff[0], rx_index, ulen - 1);  //将数据写入rf_slave.buff
 1103   6                                              }
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 19  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 19  
 
 1104   5                                      }
 1105   4                              #if 1
@@ -1214,7 +1214,7 @@ line level    source
 1163   6                                          }
 1164   5                                      }
 1165   4                              }
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 20  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 20  
 
 1166   3                              else // INIT MODE
 1167   3                              {
@@ -1278,7 +1278,7 @@ line level    source
               
                               if((ulen1 == sizeof(ack_data)) && \
                               (!memcmp(ack_data, rf_slave.buff, ulen1)))
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 21  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 21  
 
                               {
                                       // idle or ping pkt
@@ -1342,7 +1342,7 @@ line level    source
                                                                               }
                                                                       }
                                                               }
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 22  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 22  
 
                                                       }
                                                       else
@@ -1406,7 +1406,7 @@ line level    source
 1349          {
 1350   1              UINT8 init_mac[4] = {MAC0, MAC1, MAC2, MAC3};
 1351   1              
-C51 COMPILER V9.01   UART2USB                                                              11/05/2018 17:07:44 PAGE 23  
+C51 COMPILER V9.01   UART2USB                                                              11/06/2018 09:42:59 PAGE 23  
 
 1352   1              rf_set_pipe(PIPE_INDEX_MAX);
 1353   1              rf_set_ch();
