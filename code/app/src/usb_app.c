@@ -153,7 +153,7 @@ void usb_speed_set(UINT8 usb_speed)
 //;-------------------------------------------------------------;
 //; usb vcom send data, use ep2                                 ;
 //;-------------------------------------------------------------;
-void usb_gbk_input(UINT16 gbk)
+void usb_gbk_input(UINT16 gbk,UINT8 speed)
 {
     UINT8 i, key[5];
 
@@ -167,7 +167,7 @@ void usb_gbk_input(UINT16 gbk)
     gbk /= 10;
     key[0] = gbk % 10;
     
-    usb_key_report(0x40, 0);
+    usb_key_report(0x04, 0);	usb_speed_set(speed);
     for(i = 0; i < 5; i++)
     {
         if(key[i] == 0)
@@ -178,10 +178,10 @@ void usb_gbk_input(UINT16 gbk)
         {
             key[i] = key[i]-1+hid_nk_1;
         }
-        usb_key_report(0x40, key[i]);
-        usb_key_report(0x40, 0);
+        usb_key_report(0x04, key[i]);	usb_speed_set(speed);
+        usb_key_report(0x04, 0);		usb_speed_set(speed);
     }
-    usb_key_report(0, 0);
+    usb_key_report(0, 0);	usb_speed_set(speed);
 }
 
 /*************************************************************************
@@ -194,11 +194,80 @@ void usb_gbk_input(UINT16 gbk)
 *	Author 		: 	Sycreader
 *	Date 		: 	2016 - 05 - 25
 ***************************************************************************/
-BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
+static char yyy[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static BOOL datacheck(UINT8 *send_buff, UINT16 length)
 {
+	uint8 i;
+	if(length != sizeof(yyy))
+		return FALSE;
+
+	for(i=0;i<length-1;i++)
+	{
+		if(yyy[i] != send_buff[i])
+		{
+			return FALSE;
+		}
+	}
+	if(0x0d != send_buff[length-1])
+	{
+		return FALSE;	
+	}
+
+	return TRUE;
+}
+
+static uint8 countBuf[7]={0,0,0,0,0,0,'\r'};
+
+static void countBufHandle(void)
+{
+	uint8 carry=0,i=5;
+	
+	do{
+		carry = 0;	
+		countBuf[i]++;
+		if(countBuf[i] == 10)
+		{
+			countBuf[i] = 0;
+			carry = 1;	
+			i--;
+			if(i==0xff)
+			{
+				return;
+			}
+		}
+	}while(carry);
+}
+BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 speed)
+{
+	
 	UINT8 dat_buff[8] = {0};
 	UINT8 index;
 	UINT8 tmp;
+
+	countBufHandle();
+
+	//测试端数据判断
+	if(!datacheck(send_buff,length))
+	{
+		send_buff[0]='e';
+		send_buff[1]='r';
+		send_buff[2]='r';
+		send_buff[3]='o';
+		send_buff[4]='r';
+		send_buff[5] ='\r';
+		length=6;
+	}
+	else
+	{
+		send_buff[0]=countBuf[0] + '0';
+		send_buff[1]=countBuf[1] + '0';
+		send_buff[2]=countBuf[2] + '0';
+		send_buff[3]=countBuf[3] + '0';
+		send_buff[4]=countBuf[4] + '0';
+		send_buff[5]=countBuf[5] + '0';
+		send_buff[6] ='\r';
+		length=7;
+	}
 	
     while(length--)
     {
@@ -211,75 +280,58 @@ BOOL usb_key_send(UINT8 *send_buff, UINT16 length, UINT8 type)
         
         watchdog_feed();
 
-        
-//            UINT8 lang;
-            //LANG lang_p;
-            
-	        index = *send_buff++;
+        index = *send_buff++;
 
 
-            if(index == 0xFF) // gbk head sign
+        if(index == 0xFF) // gbk head sign
+        {
+            if(length >= 2)
             {
-                if(length >= 2)
-                {
-                    UINT16 gbk;
-                    
-                    gbk = *send_buff++;
-                    gbk <<= 8;
-                    gbk += *send_buff++;
-                    length -=2;
-                    
-                    usb_gbk_input(gbk);
-                    continue;
-                }
-                else // not valid len
-                {
-                    return FALSE;
-                }
-            }
-
-
-//            if(index < 0x20)
-//            {
-//                lang = 0;
-//            }
-//            else
-//			{
-//                lang = type & 0x0F;
-//                if(lang > 9) // 0 ~ 6
-//                {
-//                    lang = 0;
-//                }
-//				
-//				if(lang != 0)
-//                {
-//                    index -= 0x20;
-//                }
-//			}
-
-			//language(lang, index, &lang_p);
-            //tmp = lang_p.hid;
-            tmp = (lang_ptr[0])[index].hid;
-            
-            if(tmp == 0x00)
-                continue;
+                UINT16 gbk;
                 
-            dat_buff[2] = tmp;
-            dat_buff[0] = (lang_ptr[0])[index].func;
-            //dat_buff[0] = lang_p.func;
+                gbk = *send_buff++;
+                gbk <<= 8;
+                gbk += *send_buff++;
+                length -=2;
+                
+                usb_gbk_input(gbk,speed);
+                continue;
+            }
+            else // not valid len
+            {
+                return FALSE;
+            }
+        }
+        else
+        {
+        	if(index >= 0x20)
+				usb_gbk_input(index,speed);
+			else	//防止有些测试软件打印不了换行符号，只能使用键值
+			{
 
-		
+				tmp = (lang_ptr[0])[index].hid;
+				
+				if(tmp == 0x00)
+					continue;
+					
+				dat_buff[2] = tmp;
+				dat_buff[0] = (lang_ptr[0])[index].func;
+				//dat_buff[0] = lang_p.func;
+			
 
+			
+				/* USB Key Send */
+				Ep1_Send(dat_buff, 8);
+				usb_speed_set(speed);
+				
+				/* USB key Clear */
+				dat_buff[0] = 0;
+				dat_buff[2] = 0;
+				Ep1_Send(dat_buff, 8);
+				usb_speed_set(speed);
+			}
+        }
 
-        /* USB Key Send */
-		Ep1_Send(dat_buff, 8);
-        usb_speed_set(type);
-        
-        /* USB key Clear */
-		dat_buff[0] = 0;
-		dat_buff[2] = 0;
-		Ep1_Send(dat_buff, 8);
-		usb_speed_set(type);
     }
 
     return TRUE;

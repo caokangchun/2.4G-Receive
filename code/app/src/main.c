@@ -89,11 +89,9 @@ int main(void)
 				rf_to_usb(DATA_MODE);
 
 			   /*≤‚ ‘*/
-//					usb_key_send(xxx,sizeof(xxx),2);
+//					usb_key_send(xxx,sizeof(xxx)-1,2);
 //					delay_1ms(800);
 
-
-//					ReceiveCompleteAck();
 
 				/*≤‚ ‘end*/
 				break;

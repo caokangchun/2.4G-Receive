@@ -754,7 +754,7 @@ void usb_data_proc1(UINT8 mode, UINT8 *data_buff)
     			watchdog_feed();
 
     			/* send scan data from rf host ------------------------- */
-    			usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, 2);		//-1  crc
+    			usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, 0);		//-1  crc
 			}
 		}
 	}

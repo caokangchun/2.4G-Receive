@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   MAIN                                                                  11/06/2018 16:30:12 PAGE 1   
+C51 COMPILER V9.01   MAIN                                                                  11/07/2018 13:57:10 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
@@ -62,7 +62,7 @@ line level    source
   51   1              while(1)
   52   1              {
   53   2                      watchdog_feed();
-C51 COMPILER V9.01   MAIN                                                                  11/06/2018 16:30:12 PAGE 2   
+C51 COMPILER V9.01   MAIN                                                                  11/07/2018 13:57:10 PAGE 2   
 
   54   2                      
   55   2              #ifdef _RF_HOST
@@ -102,41 +102,39 @@ line level    source
   89   3                                      rf_to_usb(DATA_MODE);
   90   3      
   91   3                                 /*≤‚ ‘*/
-  92   3      //                                      usb_key_send(xxx,sizeof(xxx),2);
+  92   3      //                                      usb_key_send(xxx,sizeof(xxx)-1,2);
   93   3      //                                      delay_1ms(800);
   94   3      
   95   3      
-  96   3      //                                      ReceiveCompleteAck();
-  97   3      
-  98   3                                      /*≤‚ ‘end*/
-  99   3                                      break;
- 100   3      
- 101   3                              case RF_CONFIG:
- 102   3                                      /* slave power on init */
- 103   3                                      rf_slave_config();
- 104   3                                      rf_slave.status = RF_ONLINE;
- 105   3                                      break;
- 106   3      
- 107   3                              case RF_INITED:
- 108   3                              //if(usb_connected())
- 109   3                              rf_slave.status = RF_CONFIG;
- 110   3                                  break;
- 111   3                                      
- 112   3                              case RF_UPD_S:
- 113   3                                  rf_slave_update();
- 114   3                                      rf_slave.status = RF_ONLINE;
- 115   3                                  break;
-C51 COMPILER V9.01   MAIN                                                                  11/06/2018 16:30:12 PAGE 3   
+  96   3                                      /*≤‚ ‘end*/
+  97   3                                      break;
+  98   3      
+  99   3                              case RF_CONFIG:
+ 100   3                                      /* slave power on init */
+ 101   3                                      rf_slave_config();
+ 102   3                                      rf_slave.status = RF_ONLINE;
+ 103   3                                      break;
+ 104   3      
+ 105   3                              case RF_INITED:
+ 106   3                              //if(usb_connected())
+ 107   3                              rf_slave.status = RF_CONFIG;
+ 108   3                                  break;
+ 109   3                                      
+ 110   3                              case RF_UPD_S:
+ 111   3                                  rf_slave_update();
+ 112   3                                      rf_slave.status = RF_ONLINE;
+ 113   3                                  break;
+ 114   3                                      
+ 115   3                              default:
+C51 COMPILER V9.01   MAIN                                                                  11/07/2018 13:57:10 PAGE 3   
 
- 116   3                                      
- 117   3                              default:
- 118   3                                      break;
- 119   3                      }
- 120   2              #endif
- 121   2              }
- 122   1      }
- 123          
- 124          
+ 116   3                                      break;
+ 117   3                      }
+ 118   2              #endif
+ 119   2              }
+ 120   1      }
+ 121          
+ 122          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
