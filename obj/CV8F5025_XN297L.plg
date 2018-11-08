@@ -8,232 +8,233 @@ Project File Date:  11/06/2018
 
 <h2>Output:</h2>
 Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(219): warning C280: 'type': unreferenced local variable
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(38): warning C280: 'len': unreferenced local variable
+CODE\APP\SRC\UART2USB.C(44): warning C280: 'crc': unreferenced local variable
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(965): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1038): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2560 code=14310
+Program Size: data=90.2 xdata=2563 code=14672
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 2 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(219): warning C280: 'type': unreferenced local variable
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2560 code=14323
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 2 Warning(s).
-Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2560 code=14323
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(219): warning C280: 'type': unreferenced local variable
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2560 code=14323
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 2 Warning(s).
-Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2560 code=14323
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2559 code=14355
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 1 Warning(s).
+".\obj\CV8F5025_XN297L" - 0 Error(s), 6 Warning(s).
 Build target 'Target 1'
 compiling uart2usb.c...
 CODE\APP\SRC\UART2USB.C(38): warning C280: 'len': unreferenced local variable
 CODE\APP\SRC\UART2USB.C(44): warning C280: 'crc': unreferenced local variable
 CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
-code\app\src\uart2usb.c(909): warning C329: single-line comment contains line-continuation
-CODE\APP\SRC\UART2USB.C(1104): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(964): warning C173: missing return-expression
+code\app\src\uart2usb.c(1077): warning C329: single-line comment contains line-continuation
 CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
-CODE\APP\SRC\UART2USB.C(1177): warning C291: not every exit path returns a value
+CODE\APP\SRC\UART2USB.C(1037): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2559 code=14354
+Program Size: data=90.2 xdata=2563 code=14672
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
 ".\obj\CV8F5025_XN297L" - 0 Error(s), 7 Warning(s).
 Build target 'Target 1'
-compiling main.c...
 linking...
-Program Size: data=90.2 xdata=2559 code=14371
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2565 code=14239
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 1 Warning(s).
-Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2565 code=14239
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: data=90.2 xdata=2565 code=14222
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2559 code=14354
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 1 Warning(s).
-Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: data=90.2 xdata=2559 code=14371
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(223): warning C280: 'tmp': unreferenced local variable
-linking...
-Program Size: data=90.2 xdata=2565 code=14239
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 1 Warning(s).
-Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: data=90.2 xdata=2565 code=14239
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14377
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14377
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14377
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14377
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14379
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling main.c...
-linking...
-Program Size: data=90.2 xdata=2562 code=14360
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2556 code=14492
+Program Size: data=90.2 xdata=2563 code=14672
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
 ".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
 Build target 'Target 1'
 linking...
-Program Size: data=90.2 xdata=2556 code=14492
+Program Size: data=90.2 xdata=2563 code=14672
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
 ".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
 Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2556 code=14492
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2556 code=14492
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-CODE\APP\SRC\USB_APP.C(238): error C141: syntax error near '}', expected ';'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(926): error C199: left side of '->' requires struct/union pointer
+CODE\APP\SRC\UART2USB.C(930): error C100: unprintable character 0xA3 skipped
+CODE\APP\SRC\UART2USB.C(930): error C100: unprintable character 0xBB skipped
+CODE\APP\SRC\UART2USB.C(931): error C141: syntax error near '}', expected ';'
+code\app\src\uart2usb.c(1096): warning C329: single-line comment contains line-continuation
 Target not created
 Build target 'Target 1'
-compiling usb_app.c...
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(926): error C199: left side of '->' requires struct/union pointer
+code\app\src\uart2usb.c(1096): warning C329: single-line comment contains line-continuation
+Target not created
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(983): warning C173: missing return-expression
+code\app\src\uart2usb.c(1096): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1056): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2563 code=14673
+Program Size: data=90.2 xdata=2561 code=14789
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 5 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(928): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(963): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(993): warning C173: missing return-expression
+code\app\src\uart2usb.c(1106): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1066): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2561 code=14841
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 7 Warning(s).
+Build target 'Target 1'
+linking...
+Program Size: data=90.2 xdata=2561 code=14841
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
 ".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
 Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1158): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1231): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2563 code=14673
+Program Size: data=90.2 xdata=2567 code=14744
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 5 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1161): warning C173: missing return-expression
+code\app\src\uart2usb.c(1274): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1234): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2567 code=14744
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 6 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(928): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(963): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(993): warning C173: missing return-expression
+code\app\src\uart2usb.c(1110): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1066): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2561 code=14841
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 7 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1165): warning C173: missing return-expression
+code\app\src\uart2usb.c(1284): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1238): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2567 code=14744
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 6 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1131): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(1171): warning C173: missing return-expression
+code\app\src\uart2usb.c(1290): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1244): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2561 code=14784
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 7 Warning(s).
+Build target 'Target 1'
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1131): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(1171): warning C173: missing return-expression
+code\app\src\uart2usb.c(1290): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1244): warning C291: not every exit path returns a value
+linking...
+Program Size: data=90.2 xdata=2561 code=14802
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 7 Warning(s).
+Build target 'Target 1'
+linking...
+Program Size: data=90.2 xdata=2561 code=14802
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+code\app\src\uart2usb.c(908): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(1131): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(1171): warning C173: missing return-expression
+code\app\src\uart2usb.c(1290): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1244): warning C291: not every exit path returns a value
+C51 FATAL-ERROR -
+  ACTION:  CREATING OBJECT-FILE
+  FILE:    .\obj\uart2usb.obj
+  ERROR:   CAN'T CREATE FILE
+C51 TERMINATED.
+Build target 'Target 1'
+linking...
+Program Size: data=90.2 xdata=2561 code=14802
+creating hex file from ".\obj\CV8F5025_XN297L"...
+User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
+".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(97): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(933): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(973): warning C173: missing return-expression
+code\app\src\uart2usb.c(1092): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(97): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1046): warning C291: not every exit path returns a value
+code\app\src\uart2usb.c - 0 Error(s), 6 Warning(s).
+Build target 'Target 1'
+linking...
+Program Size: data=90.2 xdata=2561 code=14802
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
 ".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
 Build target 'Target 1'
-compiling usb_app.c...
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(92): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(925): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(965): warning C173: missing return-expression
+code\app\src\uart2usb.c(1084): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(92): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1038): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2563 code=14672
+Program Size: data=90.2 xdata=2560 code=14790
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
+".\obj\CV8F5025_XN297L" - 0 Error(s), 6 Warning(s).
 Build target 'Target 1'
-compiling usb_app.c...
+compiling uart2usb.c...
+CODE\APP\SRC\UART2USB.C(91): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(924): warning C173: missing return-expression
+CODE\APP\SRC\UART2USB.C(964): warning C173: missing return-expression
+code\app\src\uart2usb.c(1083): warning C329: single-line comment contains line-continuation
+CODE\APP\SRC\UART2USB.C(91): warning C290: missing return value
+CODE\APP\SRC\UART2USB.C(1037): warning C291: not every exit path returns a value
 linking...
-Program Size: data=90.2 xdata=2563 code=14672
+Program Size: data=90.2 xdata=2560 code=14790
 creating hex file from ".\obj\CV8F5025_XN297L"...
 User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-compiling usb_app.c...
-linking...
-Program Size: data=90.2 xdata=2563 code=14672
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
-Build target 'Target 1'
-linking...
-Program Size: data=90.2 xdata=2563 code=14672
-creating hex file from ".\obj\CV8F5025_XN297L"...
-User command #1: obj/HEX80CONVERT_V1.03.exe  /W:8 /D:26624/S:CV8F5025_XN297L.hex
-".\obj\CV8F5025_XN297L" - 0 Error(s), 0 Warning(s).
+".\obj\CV8F5025_XN297L" - 0 Error(s), 6 Warning(s).

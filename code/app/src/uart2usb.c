@@ -43,21 +43,21 @@ static BOOL	isCmdPkt(unsigned char *ptr, unsigned char len)
 	CMD_UPLOAD *cmdPtr = (CMD_UPLOAD*)ptr;
 	UINT8 crc;
 	
-//	if(len != sizeof(CMD_UPLOAD))
-//	{
-//		return FALSE;
-//	}
+	if(len != sizeof(CMD_UPLOAD))
+	{
+		return FALSE;
+	}
 
 	if((cmdPtr->prefix1 != 0xfe) || (cmdPtr->prefix2 != 0xef))
 	{
 		return FALSE;
 	}
 
-//	crc = crc_high_first(ptr,len);
-//	if(crc != cmdPtr->crc)
-//	{
-//		return FALSE;
-//	}
+	crc = crc_high_first(ptr,len-1);
+	if(crc != cmdPtr->crc)
+	{
+		return FALSE;
+	}
 
 	return TRUE;
 	
@@ -81,19 +81,13 @@ static BOOL checkData(unsigned char *ptr, UINT16 len)
 
 static BOOL ReceiveCompleteAck(UINT8 pid)
 {
-	UINT8 ack_tmp[4],ack_len,n=2;
+	UINT8 ack_tmp[4],ack_len;
 
 	spidAck[1] = pid;	//写入回复信息中
+
 	rf_slave.rx_tout = 0;
-
-
-//	while(n--)
-	{
-		rf_slave.rx_tout = 0;
-		//rf_transceiver(RF_TRANSFER, 1,spidAck, 4, ack_tmp, sizeof(ack_tmp), &ack_len); //发送响应	
-		rf_transceiver(RF_RECEIVER, RF_RX_TOUT, spidAck, sizeof(spidAck), ack_tmp, RF_FIFO_MAX, &ack_len);
-	}
-		
+	rf_transceiver(RF_RECEIVER, RF_RX_TOUT, spidAck, sizeof(spidAck), ack_tmp, RF_FIFO_MAX, &ack_len);
+	
 }
 
 
@@ -737,27 +731,24 @@ void usb_data_proc(UINT8 mode, UINT8 *data_buff)
 //------------------------------------------------------------------------
 void usb_data_proc1(UINT8 mode, UINT8 *data_buff)	
 {
-//	if(rf_slave.pkt_id != (data_buff[3] & 0x1F))
+	rf_slave.clear_t = RF_SEND_TOUT;
+	
+	if(mode != INIT_MODE)
 	{
-		rf_slave.clear_t = RF_SEND_TOUT;
+		UINT16 total_len;
+
+		total_len = data_buff[1];
+		total_len <<= 8;
+		total_len += data_buff[2];
+
 		
-		if(mode != INIT_MODE)
-		{
-			UINT16 total_len;
+		watchdog_feed();
 
-			total_len = data_buff[1];
-			total_len <<= 8;
-			total_len += data_buff[2];
-
-			//if(!usb_type_cmd(&data_buff[HEAD_LEN+2], total_len-(HEAD_LEN+2)))
-			{
-    			watchdog_feed();
-
-    			/* send scan data from rf host ------------------------- */
-    			usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, 0);		//-1  crc
-			}
-		}
+		/* send scan data from rf host ------------------------- */
+		usb_key_send(&data_buff[HEAD_LEN+2], total_len - (HEAD_LEN+2)-1, 0);		//-1  crc
+		
 	}
+	
 }
 //void usb_data_proc1(UINT8 mode, UINT8 *data_buff)	
 //{
@@ -868,147 +859,10 @@ void usb_data_proc1(UINT8 mode, UINT8 *data_buff)
 //}
 
 #ifdef RF_250KBPS
-//------------------------------------------------------------------------
-//	Description	: 	UART data to usb send
-//	Parameters 	: 	none
-//	Return 		: 	none
-//	Author 		: 	RAY
-//	Date 		: 	2014 - 03 - 11
-//------------------------------------------------------------------------
-//BOOL rf_to_usb(UINT8 mode)
-//{
-//	BOOL rx_ok;
-//	UINT8 i;
-//	UINT8 ulen;
-//	UINT8 ack_data[4];
-//	UINT8 bag_id;
-//	UINT16 total_len = 0;
-//	UINT8 *rx_index = NULL;
-//
-//	/* clear recv time out */
-//	rf_slave.rx_tout = 0;
-//
-//	for(i = 0; i < 100; i++)
-//	{
-//	RF_RECEIVE:
-//	    
-//        watchdog_feed();
-//	    
-//		if(mode == INIT_MODE)
-//		{
-//			rf_get_mac(ack_data); // ack MAC to Host
-//		}
-//		else // DATA MODE
-//		{
-//			//my_memcpy(ack_data, (code_ptr *)&rf_ack[i][0], ACK_C);
-//			memcpy(ack_data, &rf_ack[0][0], ACK_C);
-//		}
-//
-//		rx_index = &rf_slave.buff[i*(RF_FIFO_MAX-1)];
-//		
-//		rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
-//							   rx_index, RF_FIFO_MAX, &ulen);
-//
-//		if(rx_ok) // get RF data
-//		{
-//			//uart_send_byte(rx_index[0]);
-//			
-//			/* clear rx time out */
-//			rf_slave.rx_tout = 0;
-//
-//			/* get current data bag id */
-//			bag_id = rx_index[0];
-//
-//			if((bag_id >= 1) & (bag_id <= 102)) // support 102 bag
-//			{
-//				if(bag_id == (i + 1)) // bag id is correct
-//				{
-//					memcpy(rx_index, rx_index + 1, ulen - 1); // shift left one byte
-//					total_len += (ulen - 1);
-//				}
-//			#if 1
-//				else if(bag_id == i) // bag id to be last one
-//				{
-//					// receive again
-//					goto RF_RECEIVE;
-//				}
-//			#endif /* 0 */
-//				else // bag id is incorrect
-//				{
-//					rx_ok = 0;
-//					break;
-//				}
-//			}
-//			else // bag id is incorrect
-//			{
-//				rx_ok = 0;
-//				break;
-//			}
-//		}
-//		else
-//		{
-//			break; // RF rx timeout
-//		}
-//
-//		if(rx_ok)
-//		{
-//			if(mode == DATA_MODE)
-//			{
-//			    if(rf_slave.buff[0] != 0xFF) // Old Protocol
-//			    {
-//    				if(rf_slave.buff[0] == total_len) // full data bag received
-//    				{
-//    					//uart_send_byte(0xAA);
-//
-//    					// last bag may need more ack
-//    					rf_slave.rx_tout = RF_RECV_TOUT;
-//    					rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
-//
-//                        beep_wait_over();
-//                        delay_1ms(10);
-//                        beep_enable(60);
-//
-//    	        		/* handle the received rf data */
-//    	        		usb_data_proc(mode, rf_slave.buff);    	                
-//    					break;
-//    				}
-//				}
-//				else // New Protocol
-//				{
-//				    UINT16 temp_len;
-//
-//				    temp_len = rf_slave.buff[1];
-//				    temp_len <<= 8;
-//				    temp_len += rf_slave.buff[2];
-//
-//				    if(temp_len == total_len) // full data bag received
-//				    {
-//    					// last bag may need more ack
-//    					rf_slave.rx_tout = RF_RECV_TOUT;
-//    					rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
-//
-//                        beep_wait_over();
-//                        delay_1ms(10);
-//                        beep_enable(60);
-//
-//    	        		/* handle the received rf data */
-//    	        		usb_data_proc1(mode, rf_slave.buff);
-//    					break;
-//				    }
-//				}
-//			}
-//			else // INIT MODE
-//			{
-//				break;
-//			}
-//		}
-//	}
-//    
-//	memset(rf_slave.buff, 0, sizeof(rf_slave.buff));
-//
-//	return rx_ok;
-//}
+
 static UINT8 rx_temp[RF_FIFO_MAX]={0};
+
+
 
 BOOL rf_to_usb(UINT8 mode)
 {
@@ -1057,6 +911,32 @@ BOOL rf_to_usb(UINT8 mode)
 			/* clear rx time out */
 			rf_slave.rx_tout = 0;
 
+
+			/*添加命令包*/
+				if(isCmdPkt(rx_index, ulen))	//是命令包
+				{
+					if(((CMD_UPLOAD*)rx_index)->sid == rf_slave.pkt_id)
+					{
+						usb_data_proc1(mode, rf_slave.buff);	//usb上传 
+						rf_slave.pkt_id = INIT_ID; //clear pid
+						break;
+					}
+					return;
+				}
+			/**/
+
+
+
+
+
+
+
+
+
+
+
+
+
 			/* get current data bag id */
 			bag_id = rx_index[0];
 
@@ -1066,26 +946,6 @@ BOOL rf_to_usb(UINT8 mode)
 				{
 					memcpy(rx_index, rx_index + 1, ulen - 1); // shift left one byte		 //左移1字节
 					total_len += (ulen - 1);
-
-
-
-
-/*添加命令包*/
-//					if(isCmdPkt(rx_index+6, ulen - 7))	//是命令包
-//					{
-//						if(((CMD_UPLOAD*)(rx_index+6))->sid == rf_slave.pkt_id)
-//						{
-//							usb_data_proc1(mode, rf_slave.buff);	//usb上传 
-//							rf_slave.pkt_id = INIT_ID; //clear pid
-//						}
-//						break;
-//					}
-/**/					
-
-
-
-
-
 
 					if(1==bag_id)
 					{
@@ -1175,6 +1035,177 @@ BOOL rf_to_usb(UINT8 mode)
 
 	return rx_ok;
 }
+
+
+
+
+
+
+//BOOL rf_to_usb(UINT8 mode)
+//{
+//	BOOL rx_ok;
+//	UINT8 i;
+//	UINT8 ulen;
+//	UINT8 ack_data[4];
+//	UINT8 bag_id;
+//	UINT16 total_len = 0;
+//	UINT8 *rx_index = NULL;
+//
+//	/* clear recv time out */
+//	rf_slave.rx_tout = 0;
+//
+//	for(i = 0; i < 100; i++)
+//	{
+//	RF_RECEIVE:
+//	    
+//        watchdog_feed();
+//	    
+//		if(mode == INIT_MODE)
+//		{
+//			rf_get_mac(ack_data); // ack MAC to Host
+//		}
+//		else // DATA MODE
+//		{
+//			//my_memcpy(ack_data, (code_ptr *)&rf_ack[i][0], ACK_C);
+//			memcpy(ack_data, &rf_ack[0][0], ACK_C);
+//		}
+//
+//		if(0 != i)	//非第一组
+//		{
+//			rx_index = &rf_slave.buff[i*(RF_FIFO_MAX-1)];
+//		}
+//		else		//第一组数据
+//		{
+//			rx_index = rx_temp;
+//		}
+//		
+//		//接收
+//		rx_ok = rf_transceiver(RF_RECEIVER, RF_RX_TOUT, ack_data, sizeof(ack_data), \
+//							   rx_index, RF_FIFO_MAX, &ulen);
+//
+//		if(rx_ok) // get RF data
+//		{
+//			/* clear rx time out */
+//			rf_slave.rx_tout = 0;
+//
+//			/* get current data bag id */
+//			bag_id = rx_index[0];
+//
+//			if((bag_id >= 1) & (bag_id <= 102)) // support 102 bag
+//			{
+//				if(bag_id == (i + 1)) // bag id is correct
+//				{
+//					memcpy(rx_index, rx_index + 1, ulen - 1); // shift left one byte		 //左移1字节
+//					total_len += (ulen - 1);
+//
+//
+//
+//
+///*添加命令包*/
+////					if(isCmdPkt(rx_index, ulen - 1))	//命令 
+////					{
+////						if(((CMD_UPLOAD*)(rx_index+6))->sid == rf_slave.pkt_id)
+////						{
+////							usb_data_proc1(mode, rf_slave.buff);	//usb上传 
+////							rf_slave.pkt_id = INIT_ID; //clear pid
+////						}
+////						break;
+////					}
+///**/					
+//
+//
+//
+//
+//
+//
+//					if(1==bag_id)
+//					{
+//						//crc
+//						if(rx_index[0] == crc_high_first(&rx_index[1], ulen - 1 - 1))	//ulen-bagid-crc
+//						{
+//							if(rx_index[4] == rf_slave.pkt_id)	//spid == pid
+//							{
+//								usb_data_proc1(mode, rf_slave.buff);	//usb上传	
+//								rf_slave.pkt_id = INIT_ID; //clear pid
+//							}
+//							memcpy(&rf_slave.buff[0], rx_index, ulen - 1);	//将数据写入rf_slave.buff
+//						}
+//						else	//如果crc错误，退出
+//						{
+//							return;
+//						}
+//
+//					}
+//				}
+//			#if 1
+//				else if(bag_id == i) // bag id to be last one
+//				{
+//					// receive again
+//					goto RF_RECEIVE;
+//				}
+//			#endif /* 0 */
+//				else // bag id is incorrect
+//				{
+//					rx_ok = 0;
+//					break;
+//				}
+//			}
+//			else // bag id is incorrect
+//			{
+//				rx_ok = 0;
+//				break;
+//			}
+//		}
+//		else
+//		{
+//			break; // RF rx timeout
+//		}
+//
+//		if(rx_ok)
+//		{
+//			if(mode == DATA_MODE)
+//			{
+//				//if(rf_slave.buff[0] == 0xFF)
+//				{
+//				    UINT16 temp_len;
+//
+//				    temp_len = rf_slave.buff[1];
+//				    temp_len <<= 8;
+//				    temp_len += rf_slave.buff[2];
+//
+//				    if(temp_len == total_len) // full data bag received
+//				    {
+//    					// last bag may need more ack
+////    					rf_slave.rx_tout = RF_RECV_TOUT;
+////    					rf_transceiver(RF_RECEIVER, 30, ack_data, sizeof(ack_data), &i, 1, &ulen);
+//
+////                        beep_wait_over();
+////                        delay_1ms(500);		//10
+////                        beep_enable(60);
+//
+//    	        		/* handle the received rf data */
+//						//crc校验
+//						//记录spid
+//						//返回spid
+//
+//						if(checkData(&rf_slave.buff[0],temp_len))
+//						{
+//							rf_slave.pkt_id = (rf_slave.buff[3] & 0x1F);	//记录rf_slave.pkt_id 
+//							ReceiveCompleteAck(rf_slave.pkt_id);
+//						}		
+//						
+//    					break;
+//				    }
+//				}
+//			}
+//
+//		}
+//	}
+//    
+//	//memset(rf_slave.buff, 0, sizeof(rf_slave.buff));
+//
+//	return rx_ok;
+//}
 #else
 
 //------------------------------------------------------------------------
